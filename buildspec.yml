@@ -1,0 +1,38 @@
+version: 0.2
+
+env:
+  # Please refer to https://github.com/UnlyEd/slack-codebuild
+  variables:
+    SLACK_WEBHOOK_URL: "https://hooks.slack.com/services/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"
+    CODEBUILD_NOTIFY_ONLY_IF_FAIL: 1
+    CC_TEST_REPORTER_ID: XXX # TODO use Code climate TEST_REPORTER_ID in "Repo settings > Test coverage"
+
+phases:
+  install:
+    runtime-versions:
+      docker: 18
+      nodejs: 10
+    commands:
+      - yarn --production=false # Install devDependencies (to run tests) - See https://yarnpkg.com/lang/en/docs/cli/install/#toc-yarn-install-production-true-false
+      - yarn global add @unly/slack-codebuild
+      - echo Installing codebuild-extras... # Install and execute aws-codebuild-extra, which adds env variables necessary on CodeBuild (including some for CodeClimate)
+      - curl -fsSL https://raw.githubusercontent.com/UnlyEd/aws-codebuild-extras/master/install >> extras.sh
+      - . ./extras.sh
+
+  # See https://github.com/codeclimate/test-reporter/issues/379 for additional info regarding how to setup CodeBuild with CodeClimate
+  pre_build:
+    commands:
+      - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+      - chmod +x ./cc-test-reporter
+      - ./cc-test-reporter before-build
+
+  build:
+    commands:
+      - yarn test:coverage
+
+  post_build:
+    commands:
+      - ./cc-test-reporter format-coverage -t lcov --prefix ${CODEBUILD_SRC_DIR} # Looks for ./coverage/lcov.info
+      - ./cc-test-reporter after-build --debug -t lcov --exit-code $? # Uploads ./coverage/lcov.info and ./coverage/codeclimate.json
+    finally:
+      - slack-codebuild
