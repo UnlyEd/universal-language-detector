@@ -70,5 +70,14 @@
     "ts-jest": "24.2.0",
     "typescript": "3.7.4",
     "version-bump-prompt": "4.2.2"
+  },
+  "dependencies": {
+    "@unly/utils": "1.0.3",
+    "accept-language-parser": "1.5.0",
+    "i18next": "19.0.2",
+    "i18next-browser-languagedetector": "4.0.1",
+    "iso3166-1": "0.5.0",
+    "lodash.get": "4.4.2",
+    "lodash.includes": "4.3.0"
   }
 }
