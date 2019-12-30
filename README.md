@@ -7,13 +7,12 @@ This project was generated using https://github.com/UnlyEd/boilerplate-generator
 - [Getting started](#getting-started)
 - [API](#api)
 - [Contributing](#contributing)
-  * [Getting started](#getting-started-1)
+  * [Working locally](#working-locally)
   * [Test](#test)
   * [Releasing and publishing](#releasing-and-publishing)
 - [License](#license)
 
 <!-- tocstop -->
-
 
 ## Getting started
 
