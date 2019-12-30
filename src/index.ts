@@ -82,12 +82,13 @@ export const resolvePrimaryLanguageFromServer = (acceptLanguage: string | undefi
  *
  * @param {string} primaryLocale
  * @param {string} fallbackSecondaryLanguage
+ * @param {string[]} acceptedLanguages
  * @param {Function} errorHandler
  * @return {string}
  */
-export const resolveSecondaryLanguage = (primaryLocale: string, fallbackSecondaryLanguage: string = DEFAULT_LANG, errorHandler: Function = defaultErrorHandler): string => {
-  if (DEFAULT_ACCEPTED_LANGUAGES.length > 2) {
-    errorHandler(new Error(`[NOT IMPLEMENTED] - resolveSecondaryLanguage was called with ${DEFAULT_ACCEPTED_LANGUAGES.length} accepted languages, but the current implementation was not made to support more than 2. Please implement.`));
+export const resolveSecondaryLanguage = (primaryLocale: string, fallbackSecondaryLanguage: string = DEFAULT_LANG, acceptedLanguages: string[] = DEFAULT_ACCEPTED_LANGUAGES, errorHandler: Function = defaultErrorHandler): string => {
+  if (acceptedLanguages.length > 2) {
+    errorHandler(new Error(`[NOT IMPLEMENTED] - resolveSecondaryLanguage was called with ${acceptedLanguages.length} accepted languages, but the current implementation was not made to support more than 2. Please implement.`));
     return fallbackSecondaryLanguage.toLowerCase();
   } else {
     if (primaryLocale.toLowerCase() === LANG_FR.toLowerCase()) {
@@ -226,5 +227,5 @@ export const universalLanguagesDetect = (props: {
     errorHandler,
   });
 
-  return [primaryLanguage, resolveSecondaryLanguage(primaryLanguage, fallbackLanguage, errorHandler)];
+  return [primaryLanguage, resolveSecondaryLanguage(primaryLanguage, fallbackLanguage, acceptedLanguages, errorHandler)];
 };
