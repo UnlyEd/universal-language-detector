@@ -1,3 +1,6 @@
+[![Maintainability](https://api.codeclimate.com/v1/badges/424ff73928475fd2331f/maintainability)](https://codeclimate.com/github/UnlyEd/universal-language-detector/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/424ff73928475fd2331f/test_coverage)](https://codeclimate.com/github/UnlyEd/universal-language-detector/test_coverage)
+
 # Universal Language Detector
 
 > Language detector that works universally (browser + server)

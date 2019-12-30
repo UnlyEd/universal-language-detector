@@ -5,7 +5,7 @@ env:
   variables:
     SLACK_WEBHOOK_URL: "https://hooks.slack.com/services/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"
     CODEBUILD_NOTIFY_ONLY_IF_FAIL: 1
-    CC_TEST_REPORTER_ID: XXX # TODO use Code climate TEST_REPORTER_ID in "Repo settings > Test coverage"
+    CC_TEST_REPORTER_ID: 119c96b7eb866b1e2a12e2bb86b96792a4b0a7353b7450c9b1cf4bc13286d4fd
 
 phases:
   install:
