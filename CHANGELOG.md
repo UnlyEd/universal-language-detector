@@ -1,5 +1,5 @@
 CHANGELOG
 ===
 
-- v1.0.? - 2019-07-17
-    - [Enhancement] TODO
+- v1.0.0 - 2019-12-30
+    - [Release] Release production-ready 1.0.0 version

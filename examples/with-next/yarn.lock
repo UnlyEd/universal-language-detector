@@ -896,10 +896,10 @@
   resolved "https://registry.yarnpkg.com/@types/object-assign/-/object-assign-4.0.30.tgz#8949371d5a99f4381ee0f1df0a9b7a187e07e652"
   integrity sha1-iUk3HVqZ9Dge4PHfCpt6GH4H5lI=
 
-"@unly/universal-language-detector@1.0.1-beta.2":
-  version "1.0.1-beta.2"
-  resolved "https://registry.yarnpkg.com/@unly/universal-language-detector/-/universal-language-detector-1.0.1-beta.2.tgz#d0732fc365b6f41b85640097d657b3121e52e359"
-  integrity sha512-FJfILqt50d3/s9+hQmVASv+7ufANlYwBlBfJOT4igemMrQM4Uc2cMOyMSJ7qXWw9m68s36cofaV5qEXZFSPu9w==
+"@unly/universal-language-detector@1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@unly/universal-language-detector/-/universal-language-detector-1.0.1.tgz#8cb035c4f90ac3a197f3e9a75e802cbd1b33e8e9"
+  integrity sha512-lQMn4ukE4k1wFDPy1ek4bHVQAdDq+XB+dLDNBmThtDyYPnHGsg0UvM8ZLFaWrpZ/vq4lYIbS9OdJ2oYcHzciwQ==
   dependencies:
     "@unly/utils" "1.0.3"
     accept-language-parser "1.5.0"
