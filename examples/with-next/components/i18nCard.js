@@ -1,6 +1,7 @@
 import { COOKIE_LOOKUP_KEY_LANG } from '@unly/universal-language-detector';
 import Cookies from 'js-cookie';
 import React from 'react';
+
 import { ACCEPTED_LANGUAGES, FALLBACK_LANG } from '../utils/i18n';
 
 const i18nCard = (props) => {

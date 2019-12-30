@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import React from 'react';
+import Footer from '../components/footer';
 
 import Nav from '../components/nav';
 import I18nCard from '../components/i18nCard';
@@ -33,6 +34,8 @@ const Home = (props) => {
           Go to page 2
         </Link>
       </div>
+
+      <Footer />
 
       <style jsx>{`
       .hero {

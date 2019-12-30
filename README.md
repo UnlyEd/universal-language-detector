@@ -1,11 +1,24 @@
-# universal-language-detector
+# Universal Language Detector
 
-This project was generated using https://github.com/UnlyEd/boilerplate-generator/tree/master/templates/typescript-v3.5.2-OSS
+> Language detector that works universally (browser + server)
+>
+> On the server, will rely on "cookies > accept-language header"
+>
+> On the browser, will rely on "cookies > navigator settings"
+>
+> Relies on [i18next](https://github.com/i18next/i18next) behind the wheel
+>
+> Meant to be used with a universal framework, such as Next.js
+
+[Live demo with the Next.js example](https://universal-language-detector.now.sh/)
 
 <!-- toc -->
 
 - [Getting started](#getting-started)
+- [Examples](#examples)
 - [API](#api)
+  * [`universalLanguageDetect`](#universallanguagedetect)
+  * [`universalLanguagesDetect` (plural)](#universallanguagesdetect-plural)
 - [Contributing](#contributing)
   * [Working locally](#working-locally)
   * [Test](#test)
@@ -17,18 +30,93 @@ This project was generated using https://github.com/UnlyEd/boilerplate-generator
 ## Getting started
 
 ```
-yarn install
+yarn install @unly/universal-language-detector
 ```
 
 Use:
 
 ```
-yarn start
+import { universalLanguagesDetect, universalLanguageDetect } from '@unly/universal-language-detector';
 ```
+
+## Examples
+
+See [our example](./examples/with-next) featuring the Next.js framework
+
+---
 
 ## API
 
-[API](./API.md)
+> Extensive API documentation can be found in the [source code documentation](./src/index.ts)
+>
+> Only the most useful API methods are documented here, the other aren't meant to be used, even though they may be
+
+### `universalLanguageDetect`
+
+> Detects the language used, universally. 
+
+**Parameters:** _(All parameters are optional)_
+- `fallbackLanguage?`: string | undefined;
+- `acceptLanguage?`: string | undefined;
+- `serverCookies?`: object | undefined;
+- `acceptedLanguages?`: string[] | undefined;
+- `errorHandler?`: Function | undefined;
+
+**Example:**
+```js
+const lang = universalLanguageDetect({
+  fallbackLanguage: FALLBACK_LANG, // Fallback language in case the user's language cannot be resolved
+  acceptLanguage: get(req, 'headers.accept-language', undefined), // The accept-language header, only used on the server side
+  serverCookies: cookies, // Cookie "i18next" takes precedence over navigator configuration (ex: "i18next: fr"), only used on the server side
+  acceptedLanguages: ACCEPTED_LANGUAGES, // If the detected main language isn't allowed, then the fallback will be used
+  errorHandler: (error) => { // Use you own logger here, Sentry, etc.
+    console.log('Custom error handler:');
+    console.error(error);
+  }
+});
+```
+
+### `universalLanguagesDetect` (plural)
+
+> Detect the 2 most preferred user's languages.
+>
+> Most useful if you have some kind of fallback strategy when the content isn't available in the main language
+>
+> _For instance, it's very useful with GraphCMS and their GraphQL [i18n header implementation](https://graphcms.com/docs/api/content-api/#passing-a-header-flag), which has such built-in fallback_
+
+**Parameters:** _(All parameters are optional)_
+- `req`?: IncomingMessage;
+- `serverCookies`?: object;
+- `fallbackLanguage`?: string;
+- `acceptedLanguages`?: string[];
+- `errorHandler`?: Function | undefined;
+- `resolveSecondaryLanguage`?: Function | undefined;
+
+**Example:**
+```js
+const bestCountryCodes = universalLanguagesDetect({
+  req,
+  serverCookies: cookies, // Cookie "i18next" takes precedence over navigator configuration (ex: "i18next: fr")
+  fallbackLanguage: FALLBACK_LANG, // Fallback language in case the user's language cannot be resolved
+  acceptedLanguages: ACCEPTED_LANGUAGES, // If the detected main language isn't allowed, then the fallback will be used
+  errorHandler: (error) => { // Use you own logger here, Sentry, etc.
+    console.log('Custom error handler:');
+    console.error(error);
+  },
+  resolveSecondaryLanguage: (primaryLanguage, fallbackLanguage, acceptedLanguages, errorHandler) => {
+    switch (primaryLanguage) {
+      case 'fr':
+        return 'en';
+      case 'en':
+        return 'es';
+      case 'es':
+        return 'en';
+      default:
+        return 'en';
+    }
+  },
+});
+```
 
 ---
 
@@ -68,3 +156,7 @@ npm publish # Will publish to NPM
 ## License
 
 MIT
+
+---
+
+> This project was generated using https://github.com/UnlyEd/boilerplate-generator/tree/master/templates/typescript-OSS
