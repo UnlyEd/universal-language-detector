@@ -1,6 +1,6 @@
 import { IncomingMessage } from 'http';
 import {
-  COOKIE_LOOKUP_KEY_LANG, DEFAULT_LANG, LANG_EN, LANG_FR, resolvePrimaryLanguageFromServer, resolveSecondaryLanguage, universalLanguageDetect,
+  COOKIE_LOOKUP_KEY_LANG, DEFAULT_LANG, LANG_EN, LANG_FR, resolvePrimaryLanguageFromServer, defaultResolveSecondaryLanguage, universalLanguageDetect,
   universalLanguagesDetect,
 } from './index';
 
@@ -15,8 +15,8 @@ describe(`utils/language.ts`, () => {
 
   describe(`resolveSecondaryLanguage`, () => {
     test(`should resolve the proper secondary language`, async () => {
-      expect(resolveSecondaryLanguage(LANG_FR)).toEqual(LANG_EN);
-      expect(resolveSecondaryLanguage(LANG_EN)).toEqual(LANG_FR);
+      expect(defaultResolveSecondaryLanguage(LANG_FR)).toEqual(LANG_EN);
+      expect(defaultResolveSecondaryLanguage(LANG_EN)).toEqual(LANG_FR);
     });
   });
 

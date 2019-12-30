@@ -44,6 +44,37 @@ const defaultErrorHandler = (error: Error): void => {
 };
 
 /**
+ * Resolves a secondary locale based on a given primary locale
+ * The alternative locale won't be the same as the primary locale
+ *
+ * XXX This implementation assumes the app uses only FR/EN locales,
+ *  if other locales are added then the implementation should be changed
+ *
+ * Because the implementation of such a function could be business-related, we decided to provide a very simple way of handling it,
+ * while allowing to use a custom function to resolve it
+ *
+ * @param {string} primaryLocale
+ * @param {string} fallbackSecondaryLanguage
+ * @param {string[]} acceptedLanguages
+ * @param {Function} errorHandler
+ * @return {string}
+ */
+export const defaultResolveSecondaryLanguage = (primaryLocale: string, fallbackSecondaryLanguage: string = DEFAULT_LANG, acceptedLanguages: string[] = DEFAULT_ACCEPTED_LANGUAGES, errorHandler: Function = defaultErrorHandler): string => {
+  if (acceptedLanguages.length > 2) {
+    errorHandler(new Error(`[NOT IMPLEMENTED] - resolveSecondaryLanguage was called with ${acceptedLanguages.length} accepted languages, but the current implementation was not made to support more than 2. Please implement.`));
+    return fallbackSecondaryLanguage.toLowerCase();
+  } else {
+    if (primaryLocale.toLowerCase() === LANG_FR.toLowerCase()) {
+      return LANG_EN.toLowerCase();
+    } else if (primaryLocale === LANG_EN.toLowerCase()) {
+      return LANG_FR.toLowerCase();
+    } else {
+      return fallbackSecondaryLanguage.toLowerCase();
+    }
+  }
+};
+
+/**
  * Resolve the user's primary language (on the server side)
  *
  * Relies on the "accept-language" header
@@ -74,34 +105,6 @@ export const resolvePrimaryLanguageFromServer = (acceptLanguage: string | undefi
 };
 
 /**
- * Resolves a secondary locale based on a given primary locale
- * The alternative locale won't be the same as the primary locale
- *
- * XXX This implementation assumes the app uses only FR/EN locales,
- *  if other locales are added then the implementation should be changed
- *
- * @param {string} primaryLocale
- * @param {string} fallbackSecondaryLanguage
- * @param {string[]} acceptedLanguages
- * @param {Function} errorHandler
- * @return {string}
- */
-export const resolveSecondaryLanguage = (primaryLocale: string, fallbackSecondaryLanguage: string = DEFAULT_LANG, acceptedLanguages: string[] = DEFAULT_ACCEPTED_LANGUAGES, errorHandler: Function = defaultErrorHandler): string => {
-  if (acceptedLanguages.length > 2) {
-    errorHandler(new Error(`[NOT IMPLEMENTED] - resolveSecondaryLanguage was called with ${acceptedLanguages.length} accepted languages, but the current implementation was not made to support more than 2. Please implement.`));
-    return fallbackSecondaryLanguage.toLowerCase();
-  } else {
-    if (primaryLocale.toLowerCase() === LANG_FR.toLowerCase()) {
-      return LANG_EN.toLowerCase();
-    } else if (primaryLocale === LANG_EN.toLowerCase()) {
-      return LANG_FR.toLowerCase();
-    } else {
-      return fallbackSecondaryLanguage.toLowerCase();
-    }
-  }
-};
-
-/**
  * Replaces a given language by another one if it's not an allowed language
  *
  * @param {string} language
@@ -125,24 +128,22 @@ export const cleanupDisallowedLanguages = (language: string, fallbackLanguage: s
  *  - On the server, relies on cookies (provided), then on the accept-language header
  *  - On the browser, relies on cookies (global), then navigator's language
  *
- * @param {{fallbackLanguage: string; acceptLanguage?: string}} props
+ * @param props
  * @return {string}
  */
 export const universalLanguageDetect = (props: {
-  fallbackLanguage: string | undefined;
+  fallbackLanguage?: string | undefined;
   acceptLanguage?: string | undefined;
   serverCookies?: object | undefined;
   acceptedLanguages?: string[] | undefined;
   errorHandler?: Function | undefined;
-} = {
-  fallbackLanguage: DEFAULT_LANG,
-  acceptLanguage: undefined,
-  serverCookies: undefined,
-  acceptedLanguages: DEFAULT_ACCEPTED_LANGUAGES,
-  errorHandler: undefined,
-}): string => {
+} = {}): string => {
   const {
-    acceptLanguage, fallbackLanguage, serverCookies, acceptedLanguages, errorHandler,
+    fallbackLanguage = DEFAULT_LANG,
+    acceptLanguage = undefined,
+    serverCookies = undefined,
+    acceptedLanguages = DEFAULT_ACCEPTED_LANGUAGES,
+    errorHandler = undefined,
   } = props;
 
   I18next.init(); // Init may be async, but it doesn't matter here, because we just want to init the services (which is sync) so that we may use them
@@ -209,15 +210,15 @@ export const universalLanguagesDetect = (props: {
   fallbackLanguage?: string;
   acceptedLanguages?: string[];
   errorHandler?: Function | undefined;
-} = {
-  req: undefined,
-  serverCookies: undefined,
-  fallbackLanguage: DEFAULT_LANG,
-  acceptedLanguages: DEFAULT_ACCEPTED_LANGUAGES,
-  errorHandler: undefined,
-}): string[] => {
+  resolveSecondaryLanguage?: Function | undefined;
+} = {}): string[] => {
   const {
-    req, serverCookies, fallbackLanguage, acceptedLanguages, errorHandler,
+    req = undefined,
+    serverCookies = undefined,
+    fallbackLanguage = DEFAULT_LANG,
+    acceptedLanguages = DEFAULT_ACCEPTED_LANGUAGES,
+    errorHandler = undefined,
+    resolveSecondaryLanguage = defaultResolveSecondaryLanguage,
   } = props;
   const primaryLanguage = universalLanguageDetect({
     fallbackLanguage,
