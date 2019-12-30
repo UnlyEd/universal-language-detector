@@ -6,7 +6,7 @@ import React from 'react';
 
 import { ACCEPTED_LANGUAGES, FALLBACK_LANG } from '../utils/i18n';
 
-class TFPApp extends NextApp {
+class App extends NextApp {
   static async getInitialProps(props) {
     const { ctx } = props;
     const { req } = ctx;
@@ -54,4 +54,4 @@ class TFPApp extends NextApp {
   }
 }
 
-export default TFPApp;
+export default App;
