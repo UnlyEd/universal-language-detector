@@ -896,7 +896,7 @@
   resolved "https://registry.yarnpkg.com/@types/object-assign/-/object-assign-4.0.30.tgz#8949371d5a99f4381ee0f1df0a9b7a187e07e652"
   integrity sha1-iUk3HVqZ9Dge4PHfCpt6GH4H5lI=
 
-"@unly/universal-language-detector@1.0.0-beta.1":
+"@unly/universal-language-detector@1.0.1-beta.0":
   version "1.0.1-beta.0"
   resolved "https://registry.yarnpkg.com/@unly/universal-language-detector/-/universal-language-detector-1.0.1-beta.0.tgz#c1fb2681eef9ecf467e56981ad42efda174a556c"
   integrity sha512-aEbZ19o/7VL7QHsLmhXR2cvFkBqPHj4cY2LT94w5CYwjMlfe0QJzxzKj/ijjW832A1MYXWmtIeUjTQv5nYS7Gw==
@@ -2987,6 +2987,11 @@ jest-worker@24.9.0:
   dependencies:
     merge-stream "^2.0.0"
     supports-color "^6.1.0"
+
+js-cookie@2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/js-cookie/-/js-cookie-2.2.1.tgz#69e106dc5d5806894562902aa5baec3744e9b2b8"
+  integrity sha512-HvdH2LzI/EAZcUwA8+0nKNtWHqS+ZmijLA30RwZA0bo7ToCckjK5MkGhjED9KoRcXO6BaGI3I9UIzSA1FKFPOQ==
 
 js-levenshtein@^1.1.3:
   version "1.1.6"

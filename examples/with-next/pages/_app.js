@@ -24,6 +24,18 @@ class App extends NextApp {
         console.log('Custom error handler:');
         console.error(error);
       },
+      resolveSecondaryLanguage: (primaryLanguage, fallbackLanguage, acceptedLanguages, errorHandler) => {
+        switch (primaryLanguage) {
+          case 'fr':
+            return 'en';
+          case 'en':
+            return 'es';
+          case 'es':
+            return 'en';
+          default:
+            return 'en';
+        }
+      },
     });
     const lang = get(bestCountryCodes, '[0]', FALLBACK_LANG).toLowerCase();
 

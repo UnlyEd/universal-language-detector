@@ -1,17 +1,17 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import React from 'react';
-
-import Nav from '../components/nav';
 import I18nCard from '../components/i18nCard';
 
-const Home = (props) => {
+import Nav from '../components/nav';
+
+const Page2 = (props) => {
   const { bestCountryCodes, lang } = props;
 
   return (
     <div>
       <Head>
-        <title>Home</title>
+        <title>Page 2</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -19,6 +19,7 @@ const Home = (props) => {
 
       <div className="hero">
         <h1 className="title">Welcome to our "with-next" example, featuring Next.js!</h1>
+        <h2>Which works also with client-side navigation!</h2>
         <hr />
 
         <I18nCard
@@ -29,8 +30,8 @@ const Home = (props) => {
         <br />
         <hr />
         <br />
-        <Link href={'/page2'}>
-          Go to page 2
+        <Link href={'/'}>
+          Go to home
         </Link>
       </div>
 
@@ -84,4 +85,4 @@ const Home = (props) => {
   );
 };
 
-export default Home;
+export default Page2;
