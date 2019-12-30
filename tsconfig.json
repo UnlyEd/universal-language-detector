@@ -10,8 +10,8 @@
       "dom.iterable",
       "es2017"
     ],
-    "target": "esnext",
-    "module": "esnext",
+    "target": "es2018",
+    "module": "commonjs",
     "moduleResolution": "node",
     "noEmit": false,
     "noUnusedLocals": false,
