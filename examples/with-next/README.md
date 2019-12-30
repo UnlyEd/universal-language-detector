@@ -16,6 +16,10 @@ It works from the server side (SSR), and upon client side navigation too
 
 ## Contributing
 
+### Development
+
+`yarn start`
+
 ### Deploying
 
 `now`
