@@ -10,10 +10,16 @@
 >
 > Meant to be used with a universal framework, such as Next.js
 
-[Live demo with the Next.js example](https://universal-language-detector.now.sh/)
+
+Note that this lib helps resolving the **`language`** (`fr`, `en`, `es`, etc.), **not the locale** (`fr-FR`, `en-US`, etc.)
+
+_It is not out of scope though, PR are welcome to support universal locale detection._ 
+
+---
 
 <!-- toc -->
 
+- [Demo](#demo)
 - [Getting started](#getting-started)
 - [Examples](#examples)
 - [API](#api)
@@ -26,6 +32,12 @@
 - [License](#license)
 
 <!-- tocstop -->
+
+---
+
+## Demo
+
+[Live demo with the Next.js example](https://universal-language-detector.now.sh/)
 
 ## Getting started
 
@@ -103,7 +115,7 @@ const bestCountryCodes = universalLanguagesDetect({
     console.log('Custom error handler:');
     console.error(error);
   },
-  resolveSecondaryLanguage: (primaryLanguage, fallbackLanguage, acceptedLanguages, errorHandler) => {
+  resolveSecondaryLanguage: (primaryLanguage, fallbackLanguage, acceptedLanguages, errorHandler) => { // If not provided, a default implementation that only covers very simple use cases (2 languages) will be used
     switch (primaryLanguage) {
       case 'fr':
         return 'en';
