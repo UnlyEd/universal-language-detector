@@ -32,6 +32,16 @@ export const DEFAULT_LANG: string = LANG_EN;
  */
 export const COOKIE_LOOKUP_KEY_LANG = 'i18next';
 
+/**
+ * Default error handler
+ * Doesn't do anything but log the error to the console
+ *
+ * @param error
+ */
+const defaultErrorHandler = (error: Error): void => {
+  // eslint-disable-next-line no-console
+  console.error(error);
+};
 
 /**
  * Resolve the user's primary language (on the server side)
@@ -40,9 +50,10 @@ export const COOKIE_LOOKUP_KEY_LANG = 'i18next';
  *
  * @param {string} acceptLanguage
  * @param {string} fallbackLanguage
+ * @param {Function} errorHandler
  * @return {string}
  */
-export const resolvePrimaryLanguageFromServer = (acceptLanguage: string | undefined, fallbackLanguage: string = DEFAULT_LANG): string => {
+export const resolvePrimaryLanguageFromServer = (acceptLanguage: string | undefined, fallbackLanguage: string = DEFAULT_LANG, errorHandler: Function = defaultErrorHandler): string => {
   let bestCountryCode: string = fallbackLanguage;
 
   try {
@@ -52,13 +63,11 @@ export const resolvePrimaryLanguageFromServer = (acceptLanguage: string | undefi
 
     if (!bestCountryCode) {
       const errorMessage = `Couldn't resolve a proper country code: "${bestCountryCode}" from detected server "accept-language" header "${acceptLanguage}", which yield "${bestCode}" as best locale code - Applying fallback locale "${fallbackLanguage}"`;
-      // logger.error(errorMessage);
-      // Sentry.captureException(new Error(errorMessage));
+      errorHandler(new Error(errorMessage));
       bestCountryCode = fallbackLanguage;
     }
   } catch (e) {
-    // logger.error(e);
-    // Sentry.captureException(e);
+    errorHandler(e);
   }
 
   return bestCountryCode.toLowerCase();
@@ -71,13 +80,14 @@ export const resolvePrimaryLanguageFromServer = (acceptLanguage: string | undefi
  * XXX This implementation assumes the app uses only FR/EN locales,
  *  if other locales are added then the implementation should be changed
  *
- * @param primaryLocale
- * @param fallbackSecondaryLanguage
+ * @param {string} primaryLocale
+ * @param {string} fallbackSecondaryLanguage
+ * @param {Function} errorHandler
  * @return {string}
  */
-export const resolveSecondaryLanguage = (primaryLocale: string, fallbackSecondaryLanguage: string = DEFAULT_LANG): string => {
+export const resolveSecondaryLanguage = (primaryLocale: string, fallbackSecondaryLanguage: string = DEFAULT_LANG, errorHandler: Function = defaultErrorHandler): string => {
   if (DEFAULT_ACCEPTED_LANGUAGES.length > 2) {
-    // Sentry.captureMessage(`[NOT IMPLEMENTED] - resolveSecondaryLanguage was called with ${DEFAULT_ACCEPTED_LANGUAGES.length} accepted languages, but the current implementation was not made to support more than 2. Please implement.`);
+    errorHandler(new Error(`[NOT IMPLEMENTED] - resolveSecondaryLanguage was called with ${DEFAULT_ACCEPTED_LANGUAGES.length} accepted languages, but the current implementation was not made to support more than 2. Please implement.`));
     return fallbackSecondaryLanguage.toLowerCase();
   } else {
     if (primaryLocale.toLowerCase() === LANG_FR.toLowerCase()) {
@@ -122,13 +132,17 @@ export const universalLanguageDetect = (props: {
   acceptLanguage?: string | undefined;
   serverCookies?: object | undefined;
   acceptedLanguages?: string[] | undefined;
+  errorHandler?: Function | undefined;
 } = {
   fallbackLanguage: DEFAULT_LANG,
   acceptLanguage: undefined,
   serverCookies: undefined,
   acceptedLanguages: DEFAULT_ACCEPTED_LANGUAGES,
+  errorHandler: undefined,
 }): string => {
-  const { acceptLanguage, fallbackLanguage, serverCookies, acceptedLanguages } = props;
+  const {
+    acceptLanguage, fallbackLanguage, serverCookies, acceptedLanguages, errorHandler,
+  } = props;
 
   I18next.init(); // Init may be async, but it doesn't matter here, because we just want to init the services (which is sync) so that we may use them
 
@@ -166,7 +180,7 @@ export const universalLanguageDetect = (props: {
     const acceptLanguageDetector = {
       name: acceptLanguageDetectorName,
       lookup: (): string | undefined => {
-        return resolvePrimaryLanguageFromServer(acceptLanguage);
+        return resolvePrimaryLanguageFromServer(acceptLanguage, fallbackLanguage, errorHandler);
       },
       cacheUserLanguage: (): void => {
         // Do nothing, can't cache the user language on the server
@@ -193,19 +207,24 @@ export const universalLanguagesDetect = (props: {
   serverCookies?: object;
   fallbackLanguage?: string;
   acceptedLanguages?: string[];
+  errorHandler?: Function | undefined;
 } = {
   req: undefined,
   serverCookies: undefined,
   fallbackLanguage: DEFAULT_LANG,
   acceptedLanguages: DEFAULT_ACCEPTED_LANGUAGES,
+  errorHandler: undefined,
 }): string[] => {
-  const { req, serverCookies, fallbackLanguage, acceptedLanguages } = props;
+  const {
+    req, serverCookies, fallbackLanguage, acceptedLanguages, errorHandler,
+  } = props;
   const primaryLanguage = universalLanguageDetect({
     fallbackLanguage,
     acceptLanguage: get(req, 'headers.accept-language', undefined),
     serverCookies,
     acceptedLanguages,
+    errorHandler,
   });
 
-  return [primaryLanguage, resolveSecondaryLanguage(primaryLanguage)];
+  return [primaryLanguage, resolveSecondaryLanguage(primaryLanguage, fallbackLanguage, errorHandler)];
 };
