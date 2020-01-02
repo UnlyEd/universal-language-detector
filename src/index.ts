@@ -1,15 +1,14 @@
 import { isBrowser } from '@unly/utils';
-import acceptLanguageParser from 'accept-language-parser';
 import { IncomingMessage } from 'http';
 import I18next from 'i18next';
 import I18nextBrowserLanguageDetector from 'i18next-browser-languagedetector';
-import iso3166 from 'iso3166-1';
 import get from 'lodash.get';
 import includes from 'lodash.includes';
 
 import AcceptLanguageDetector from './serverDetectors/acceptLanguage';
-import FallbackDetector from './universalDetectors/fallback';
 import ServerCookieDetector from './serverDetectors/serverCookie';
+import FallbackDetector from './universalDetectors/fallback';
+import { _defaultErrorHandler, ErrorHandler, LEVEL_ERROR } from './utils/error';
 
 export const LANG_EN = 'en';
 export const LANG_FR = 'fr';
@@ -37,18 +36,6 @@ export const DEFAULT_LANG: string = LANG_EN;
 export const COOKIE_LOOKUP_KEY_LANG = 'i18next';
 
 /**
- * Default error handler
- * Doesn't do anything but log the error to the console
- *
- * @param error
- * @private
- */
-const _defaultErrorHandler = (error: Error): void => {
-  // eslint-disable-next-line no-console
-  console.error(error);
-};
-
-/**
  * Resolves a secondary locale based on a given primary locale
  * The alternative locale won't be the same as the primary locale
  *
@@ -65,9 +52,9 @@ const _defaultErrorHandler = (error: Error): void => {
  * @return {string}
  * @private
  */
-export const _defaultResolveSecondaryLanguage = (primaryLocale: string, fallbackSecondaryLanguage: string = DEFAULT_LANG, acceptedLanguages: string[] = DEFAULT_ACCEPTED_LANGUAGES, errorHandler: Function = _defaultErrorHandler): string => {
+export const _defaultResolveSecondaryLanguage = (primaryLocale: string, fallbackSecondaryLanguage: string = DEFAULT_LANG, acceptedLanguages: string[] = DEFAULT_ACCEPTED_LANGUAGES, errorHandler: ErrorHandler = _defaultErrorHandler): string => {
   if (acceptedLanguages.length > 2) {
-    errorHandler(new Error(`[NOT IMPLEMENTED] - resolveSecondaryLanguage was called with ${acceptedLanguages.length} accepted languages, but the current implementation was not made to support more than 2. Please implement.`));
+    errorHandler(new Error(`[NOT IMPLEMENTED] - resolveSecondaryLanguage was called with ${acceptedLanguages.length} accepted languages, but the current implementation was not made to support more than 2. Please implement.`), LEVEL_ERROR);
     return fallbackSecondaryLanguage.toLowerCase();
   } else {
     if (primaryLocale.toLowerCase() === LANG_FR.toLowerCase()) {
@@ -78,37 +65,6 @@ export const _defaultResolveSecondaryLanguage = (primaryLocale: string, fallback
       return fallbackSecondaryLanguage.toLowerCase();
     }
   }
-};
-
-/**
- * Resolve the user's primary language (on the server side)
- *
- * Relies on the "accept-language" header
- *
- * @param {string} acceptLanguage
- * @param {string} fallbackLanguage
- * @param {Function} errorHandler
- * @return {string}
- * @private
- */
-export const _resolvePrimaryLanguageFromServer = (acceptLanguage: string | undefined, fallbackLanguage: string = DEFAULT_LANG, errorHandler: Function = _defaultErrorHandler): string => {
-  let bestCountryCode: string = fallbackLanguage;
-
-  try {
-    const locales: string[] = acceptLanguageParser.parse(acceptLanguage);
-    const bestCode: string = get(locales, '[0].code');
-    bestCountryCode = iso3166.to2(iso3166.fromLocale(bestCode));
-
-    if (!bestCountryCode) {
-      const errorMessage = `Couldn't resolve a proper country code: "${bestCountryCode}" from detected server "accept-language" header "${acceptLanguage}", which yield "${bestCode}" as best locale code - Applying fallback locale "${fallbackLanguage}"`;
-      errorHandler(new Error(errorMessage));
-      bestCountryCode = fallbackLanguage;
-    }
-  } catch (e) {
-    errorHandler(e);
-  }
-
-  return bestCountryCode.toLowerCase();
 };
 
 /**
@@ -144,7 +100,7 @@ export const universalLanguageDetect = (props: {
   acceptLanguage?: string | undefined;
   serverCookies?: object | undefined;
   acceptedLanguages?: string[] | undefined;
-  errorHandler?: Function | undefined;
+  errorHandler?: ErrorHandler | undefined;
 } = {}): string => {
   const {
     fallbackLanguage = DEFAULT_LANG,
@@ -195,7 +151,7 @@ export const universalLanguagesDetect = (props: {
   serverCookies?: object;
   fallbackLanguage?: string;
   acceptedLanguages?: string[];
-  errorHandler?: Function | undefined;
+  errorHandler?: ErrorHandler | undefined;
   resolveSecondaryLanguage?: Function | undefined;
 } = {}): string[] => {
   const {

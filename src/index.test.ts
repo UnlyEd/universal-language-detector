@@ -1,8 +1,14 @@
 import { IncomingMessage } from 'http';
 import {
-  COOKIE_LOOKUP_KEY_LANG, DEFAULT_LANG, LANG_EN, LANG_FR, _resolvePrimaryLanguageFromServer, _defaultResolveSecondaryLanguage, universalLanguageDetect,
+  _defaultResolveSecondaryLanguage,
+  COOKIE_LOOKUP_KEY_LANG,
+  DEFAULT_LANG,
+  LANG_EN,
+  LANG_FR,
+  universalLanguageDetect,
   universalLanguagesDetect,
 } from './index';
+import { _resolvePrimaryLanguageFromServer } from './serverDetectors/acceptLanguage';
 
 describe(`utils/language.ts`, () => {
   describe(`_resolvePrimaryLanguageFromServer`, () => {
@@ -125,7 +131,7 @@ describe(`utils/language.ts`, () => {
           serverCookies: {
             [COOKIE_LOOKUP_KEY_LANG]: cookieLanguage,
           },
-          acceptedLanguages: [cookieLanguage, LANG_EN]
+          acceptedLanguages: [cookieLanguage, LANG_EN],
         })).toEqual([cookieLanguage, LANG_EN]);
       });
 
@@ -143,7 +149,7 @@ describe(`utils/language.ts`, () => {
           serverCookies: {
             [COOKIE_LOOKUP_KEY_LANG]: cookieLanguage,
           },
-          acceptedLanguages: [cookieLanguage, LANG_EN]
+          acceptedLanguages: [cookieLanguage, LANG_EN],
         })).toEqual([cookieLanguage, LANG_EN]);
       });
     });
@@ -186,7 +192,7 @@ describe(`utils/language.ts`, () => {
         };
 
         expect(universalLanguagesDetect({
-          acceptedLanguages: [cookieLanguage, LANG_EN]
+          acceptedLanguages: [cookieLanguage, LANG_EN],
         })).toEqual([cookieLanguage, LANG_EN]);
       });
     });
