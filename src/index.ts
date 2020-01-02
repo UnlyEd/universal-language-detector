@@ -7,6 +7,10 @@ import iso3166 from 'iso3166-1';
 import get from 'lodash.get';
 import includes from 'lodash.includes';
 
+import AcceptLanguageDetector from './serverDetectors/acceptLanguage';
+import FallbackDetector from './serverDetectors/fallback';
+import ServerCookieDetector from './serverDetectors/serverCookie';
+
 export const LANG_EN = 'en';
 export const LANG_FR = 'fr';
 export const DEFAULT_ACCEPTED_LANGUAGES = [
@@ -150,49 +154,27 @@ export const universalLanguageDetect = (props: {
 
   const i18nextServices = I18next.services;
   const i18nextUniversalLanguageDetector = new I18nextBrowserLanguageDetector();
-  const fallbackDetectorName = 'fallback';
-  const fallbackDetector = {
-    name: fallbackDetectorName,
-    lookup: (): string | undefined => {
-      return fallbackLanguage;
-    },
-    cacheUserLanguage: (): void => {
-      // Do nothing, can't cache the user language on the server
-    },
-  };
+
+  // Add common detectors between the browser and the server
+  const fallbackDetector = FallbackDetector(fallbackLanguage);
   i18nextUniversalLanguageDetector.addDetector(fallbackDetector);
 
   if (isBrowser()) {
+    // Rely on native i18next detectors
     i18nextUniversalLanguageDetector.init(i18nextServices, {
-      order: ['cookie', 'navigator', fallbackDetectorName],
+      order: ['cookie', 'navigator', fallbackDetector.name],
     });
 
   } else {
-    const serverCookieDetectorName = 'serverCookie';
-    const serverCookieDetector = {
-      name: serverCookieDetectorName,
-      lookup: (): string => {
-        return get(serverCookies, COOKIE_LOOKUP_KEY_LANG, undefined);
-      },
-      cacheUserLanguage: (): void => {
-        // Do nothing, we could cache the value but it doesn't make sense to overwrite the cookie with the same value
-      },
-    };
-    const acceptLanguageDetectorName = 'acceptLanguage';
-    const acceptLanguageDetector = {
-      name: acceptLanguageDetectorName,
-      lookup: (): string | undefined => {
-        return resolvePrimaryLanguageFromServer(acceptLanguage, fallbackLanguage, errorHandler);
-      },
-      cacheUserLanguage: (): void => {
-        // Do nothing, can't cache the user language on the server
-      },
-    };
+    // Use our own detectors
+    const serverCookieDetector = ServerCookieDetector(serverCookies);
+    const acceptLanguageDetector = AcceptLanguageDetector(acceptLanguage, fallbackLanguage, errorHandler);
 
     i18nextUniversalLanguageDetector.addDetector(serverCookieDetector);
     i18nextUniversalLanguageDetector.addDetector(acceptLanguageDetector);
+
     i18nextUniversalLanguageDetector.init(i18nextServices, {
-      order: [serverCookieDetectorName, acceptLanguageDetectorName, fallbackDetectorName],
+      order: [serverCookieDetector.name, acceptLanguageDetector.name, fallbackDetector.name],
     });
   }
 
