@@ -8,7 +8,7 @@ import get from 'lodash.get';
 import includes from 'lodash.includes';
 
 import AcceptLanguageDetector from './serverDetectors/acceptLanguage';
-import FallbackDetector from './serverDetectors/fallback';
+import FallbackDetector from './universalDetectors/fallback';
 import ServerCookieDetector from './serverDetectors/serverCookie';
 
 export const LANG_EN = 'en';
