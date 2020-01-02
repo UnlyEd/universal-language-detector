@@ -1,22 +1,22 @@
 import { IncomingMessage } from 'http';
 import {
-  COOKIE_LOOKUP_KEY_LANG, DEFAULT_LANG, LANG_EN, LANG_FR, resolvePrimaryLanguageFromServer, defaultResolveSecondaryLanguage, universalLanguageDetect,
+  COOKIE_LOOKUP_KEY_LANG, DEFAULT_LANG, LANG_EN, LANG_FR, _resolvePrimaryLanguageFromServer, _defaultResolveSecondaryLanguage, universalLanguageDetect,
   universalLanguagesDetect,
 } from './index';
 
 describe(`utils/language.ts`, () => {
-  describe(`resolvePrimaryLanguageFromServer`, () => {
+  describe(`_resolvePrimaryLanguageFromServer`, () => {
     test(`should resolve the proper primary language on the server`, async () => {
-      expect(resolvePrimaryLanguageFromServer(`fr,en;q=0.9,en-GB;q=0.8,en-US;q=0.7,de;q=0.6`)).toEqual('fr');
-      expect(resolvePrimaryLanguageFromServer(`en;q=0.9,en-GB;q=0.8,en-US;q=0.7,de;q=0.6`)).toEqual('en');
-      expect(resolvePrimaryLanguageFromServer(`us`)).toEqual('us');
+      expect(_resolvePrimaryLanguageFromServer(`fr,en;q=0.9,en-GB;q=0.8,en-US;q=0.7,de;q=0.6`)).toEqual('fr');
+      expect(_resolvePrimaryLanguageFromServer(`en;q=0.9,en-GB;q=0.8,en-US;q=0.7,de;q=0.6`)).toEqual('en');
+      expect(_resolvePrimaryLanguageFromServer(`us`)).toEqual('us');
     });
   });
 
-  describe(`resolveSecondaryLanguage`, () => {
+  describe(`_defaultResolveSecondaryLanguage`, () => {
     test(`should resolve the proper secondary language`, async () => {
-      expect(defaultResolveSecondaryLanguage(LANG_FR)).toEqual(LANG_EN);
-      expect(defaultResolveSecondaryLanguage(LANG_EN)).toEqual(LANG_FR);
+      expect(_defaultResolveSecondaryLanguage(LANG_FR)).toEqual(LANG_EN);
+      expect(_defaultResolveSecondaryLanguage(LANG_EN)).toEqual(LANG_FR);
     });
   });
 

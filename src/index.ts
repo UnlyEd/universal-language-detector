@@ -41,8 +41,9 @@ export const COOKIE_LOOKUP_KEY_LANG = 'i18next';
  * Doesn't do anything but log the error to the console
  *
  * @param error
+ * @private
  */
-const defaultErrorHandler = (error: Error): void => {
+const _defaultErrorHandler = (error: Error): void => {
   // eslint-disable-next-line no-console
   console.error(error);
 };
@@ -62,8 +63,9 @@ const defaultErrorHandler = (error: Error): void => {
  * @param {string[]} acceptedLanguages
  * @param {Function} errorHandler
  * @return {string}
+ * @private
  */
-export const defaultResolveSecondaryLanguage = (primaryLocale: string, fallbackSecondaryLanguage: string = DEFAULT_LANG, acceptedLanguages: string[] = DEFAULT_ACCEPTED_LANGUAGES, errorHandler: Function = defaultErrorHandler): string => {
+export const _defaultResolveSecondaryLanguage = (primaryLocale: string, fallbackSecondaryLanguage: string = DEFAULT_LANG, acceptedLanguages: string[] = DEFAULT_ACCEPTED_LANGUAGES, errorHandler: Function = _defaultErrorHandler): string => {
   if (acceptedLanguages.length > 2) {
     errorHandler(new Error(`[NOT IMPLEMENTED] - resolveSecondaryLanguage was called with ${acceptedLanguages.length} accepted languages, but the current implementation was not made to support more than 2. Please implement.`));
     return fallbackSecondaryLanguage.toLowerCase();
@@ -87,8 +89,9 @@ export const defaultResolveSecondaryLanguage = (primaryLocale: string, fallbackS
  * @param {string} fallbackLanguage
  * @param {Function} errorHandler
  * @return {string}
+ * @private
  */
-export const resolvePrimaryLanguageFromServer = (acceptLanguage: string | undefined, fallbackLanguage: string = DEFAULT_LANG, errorHandler: Function = defaultErrorHandler): string => {
+export const _resolvePrimaryLanguageFromServer = (acceptLanguage: string | undefined, fallbackLanguage: string = DEFAULT_LANG, errorHandler: Function = _defaultErrorHandler): string => {
   let bestCountryCode: string = fallbackLanguage;
 
   try {
@@ -115,8 +118,9 @@ export const resolvePrimaryLanguageFromServer = (acceptLanguage: string | undefi
  * @param {string} fallbackLanguage
  * @param {string[]} acceptedLanguages
  * @return {string}
+ * @private
  */
-export const cleanupDisallowedLanguages = (language: string, fallbackLanguage: string = DEFAULT_LANG, acceptedLanguages: string[] = DEFAULT_ACCEPTED_LANGUAGES): string => {
+export const _cleanupDisallowedLanguages = (language: string, fallbackLanguage: string = DEFAULT_LANG, acceptedLanguages: string[] = DEFAULT_ACCEPTED_LANGUAGES): string => {
   if (!includes(acceptedLanguages, language)) {
     return fallbackLanguage.toLowerCase();
   } else {
@@ -178,7 +182,7 @@ export const universalLanguageDetect = (props: {
     });
   }
 
-  return cleanupDisallowedLanguages(i18nextUniversalLanguageDetector.detect() as string, fallbackLanguage, acceptedLanguages);
+  return _cleanupDisallowedLanguages(i18nextUniversalLanguageDetector.detect() as string, fallbackLanguage, acceptedLanguages);
 };
 
 /**
@@ -200,7 +204,7 @@ export const universalLanguagesDetect = (props: {
     fallbackLanguage = DEFAULT_LANG,
     acceptedLanguages = DEFAULT_ACCEPTED_LANGUAGES,
     errorHandler = undefined,
-    resolveSecondaryLanguage = defaultResolveSecondaryLanguage,
+    resolveSecondaryLanguage = _defaultResolveSecondaryLanguage,
   } = props;
   const primaryLanguage = universalLanguageDetect({
     fallbackLanguage,
