@@ -27,6 +27,8 @@ _It is not out of scope though, PR are welcome to support universal locale detec
 - [Contributing](#contributing)
   * [Working locally](#working-locally)
   * [Test](#test)
+  * [Versions](#versions)
+    + [SemVer](#semver)
   * [Releasing and publishing](#releasing-and-publishing)
 - [License](#license)
 
