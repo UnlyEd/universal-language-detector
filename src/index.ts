@@ -69,7 +69,10 @@ export const universalLanguageDetect = (props: {
     throw new Error(`universal-language-detector is misconfigured. Your "fallbackLanguage" (value: "${fallbackLanguage}") should be within your "supportedLanguages" array.`);
   }
 
-  I18next.init(); // Init may be async, but it doesn't matter here, because we just want to init the services (which is sync) so that we may use them
+  // Init may be async, but it doesn't matter here, because we just want to init the services (which is sync) so that we may use them
+  I18next.init({
+    whitelist: supportedLanguages, // Filter out unsupported languages (i.e: when using "navigator" detector) - See https://www.i18next.com/overview/configuration-options#languages-namespaces-resources
+  });
 
   const i18nextServices = I18next.services;
   const i18nextUniversalLanguageDetector = new I18nextBrowserLanguageDetector();
