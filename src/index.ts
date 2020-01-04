@@ -12,7 +12,6 @@ import { ErrorHandler } from './utils/error';
 /**
  * Lookup key that contains the value of the user's selected language
  *
- * XXX Must use the same value as the value used by i18next-browser-languageDetector "lookupCookie"
  * @see https://github.com/i18next/i18next-browser-languageDetector#detector-options
  *
  * @type {string}
@@ -83,6 +82,7 @@ export const universalLanguageDetect = (props: {
     // Rely on native i18next detectors
     i18nextUniversalLanguageDetector.init(i18nextServices, {
       order: ['cookie', 'navigator', fallbackDetector.name],
+      lookupCookie: COOKIE_LOOKUP_KEY_LANG,
     });
 
   } else {
@@ -95,6 +95,7 @@ export const universalLanguageDetect = (props: {
 
     i18nextUniversalLanguageDetector.init(i18nextServices, {
       order: [serverCookieDetector.name, acceptLanguageDetector.name, fallbackDetector.name],
+      lookupCookie: COOKIE_LOOKUP_KEY_LANG,
     });
   }
 
