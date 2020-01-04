@@ -7,7 +7,7 @@ import I18nCard from '../components/i18nCard';
 import Nav from '../components/nav';
 
 const Page2 = (props) => {
-  const { bestCountryCodes, lang } = props;
+  const { lang } = props;
 
   return (
     <div>
@@ -24,7 +24,6 @@ const Page2 = (props) => {
         <hr />
 
         <I18nCard
-          bestCountryCodes={bestCountryCodes}
           lang={lang}
         />
 

@@ -2,18 +2,17 @@ import { COOKIE_LOOKUP_KEY_LANG } from '@unly/universal-language-detector';
 import Cookies from 'js-cookie';
 import React from 'react';
 
-import { SUPPORTED_LANGUAGES, FALLBACK_LANG } from '../utils/i18n';
+import { FALLBACK_LANG, SUPPORTED_LANGUAGES } from '../utils/i18n';
 
 const i18nCard = (props) => {
-  const { bestCountryCodes, lang } = props;
+  const { lang } = props;
 
   return (
     <>
       <div className="description">
         <strong>Detected language</strong>: <pre>{lang}</pre>
-        Detected best languages: <pre>{bestCountryCodes.join(', ')}</pre>
         Using fallback language (if lang cannot be resolved): <pre>{FALLBACK_LANG}</pre>
-        Using allowed languages: <pre>{SUPPORTED_LANGUAGES.join(', ')}</pre>
+        Using supported languages (unsupported languages will be ignored): <pre>{SUPPORTED_LANGUAGES.join(', ')}</pre>
       </div>
 
       <div className="description">
@@ -43,6 +42,34 @@ const i18nCard = (props) => {
           >
             Spanish
           </button>
+          <button
+            onClick={() => {
+              Cookies.set(COOKIE_LOOKUP_KEY_LANG, 'de');
+              location.reload();
+            }}
+          >
+            Deutsch
+          </button>
+
+          <br />
+
+          <button
+            onClick={() => {
+              Cookies.remove(COOKIE_LOOKUP_KEY_LANG, 'es');
+              location.reload();
+            }}
+          >
+            Clear cookie
+          </button>
+
+          <div
+            style={{
+              fontStyle: 'italic',
+              marginTop: 10,
+            }}
+          >
+            When using cookies, the "Deutsch" cookie will be ignored, because it's not within the supported languages
+          </div>
         </div>
       </div>
 

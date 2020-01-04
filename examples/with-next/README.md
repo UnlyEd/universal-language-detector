@@ -2,7 +2,7 @@
 
 See the [_app.js](./pages/_app.js) file, that's where the magic happens.
 
-In this demo, we automatically resolve the language for all pages through the _app file, which makes the `lang` and `bestCountryCodes` variable available in all pages.
+In this demo, we automatically resolve the language for all pages through the _app file, which makes the `lang` variable available in all pages.
 
 It works from the server side (SSR), and upon client side navigation too
 
