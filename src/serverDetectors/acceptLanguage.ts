@@ -23,7 +23,12 @@ export const _resolveAcceptLanguage = (supportedLanguages: string[], acceptLangu
     });
 
   } catch (e) {
-    errorHandler(e, ERROR_LEVELS.ERROR);
+    errorHandler(e, ERROR_LEVELS.ERROR, '_resolveAcceptLanguage', {
+      inputs: {
+        supportedLanguages,
+        acceptLanguageHeader,
+      },
+    });
   }
 
   if (bestSupportedLanguage) {
@@ -31,7 +36,13 @@ export const _resolveAcceptLanguage = (supportedLanguages: string[], acceptLangu
       // Attempts to convert the language/locale into an actual language (2 chars string)
       return iso3166.to2(iso3166.fromLocale(bestSupportedLanguage)).toLowerCase();
     } catch (e) {
-      errorHandler(e, ERROR_LEVELS.ERROR);
+      errorHandler(e, ERROR_LEVELS.ERROR, '_resolveAcceptLanguage', {
+        inputs: {
+          supportedLanguages,
+          acceptLanguageHeader,
+        },
+        bestSupportedLanguage,
+      });
     }
   }
 };
