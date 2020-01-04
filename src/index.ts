@@ -104,3 +104,5 @@ export const universalLanguageDetect = (props: {
 
   return _cleanupDisallowedLanguages(i18nextUniversalLanguageDetector.detect() as string, fallbackLanguage, supportedLanguages);
 };
+
+export default universalLanguageDetect;
