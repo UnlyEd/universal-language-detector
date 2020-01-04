@@ -6,7 +6,7 @@ export enum ERROR_LEVELS {
 export const LEVEL_ERROR = ERROR_LEVELS.ERROR;
 export const LEVEL_WARNING = ERROR_LEVELS.WARNING;
 
-export declare type ErrorHandler = (error: Error, level: ERROR_LEVELS) => void;
+export declare type ErrorHandler = (error: Error, level: ERROR_LEVELS) => void; // TODO origin ?
 
 /**
  * Default error handler

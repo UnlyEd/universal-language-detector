@@ -4,7 +4,7 @@ import NextCookies from 'next-cookies';
 import NextApp from 'next/app';
 import React from 'react';
 
-import { ACCEPTED_LANGUAGES, FALLBACK_LANG } from '../utils/i18n';
+import { SUPPORTED_LANGUAGES, FALLBACK_LANG } from '../utils/i18n';
 
 class App extends NextApp {
   static async getInitialProps(props) {
@@ -19,12 +19,12 @@ class App extends NextApp {
       req,
       serverCookies: cookies, // Cookie "i18next" takes precedence over navigator configuration (ex: "i18next: fr")
       fallbackLanguage: FALLBACK_LANG, // Fallback language in case the user's language cannot be resolved
-      acceptedLanguages: ACCEPTED_LANGUAGES, // If the detected main language isn't allowed, then the fallback will be used
+      supportedLanguages: SUPPORTED_LANGUAGES, // If the detected main language isn't allowed, then the closest supported language will be used
       errorHandler: (error) => { // Use you own logger here, Sentry, etc.
         console.log('Custom error handler:');
         console.error(error);
       },
-      resolveSecondaryLanguage: (primaryLanguage, fallbackLanguage, acceptedLanguages, errorHandler) => {
+      resolveSecondaryLanguage: (primaryLanguage, fallbackLanguage, supportedLanguages, errorHandler) => {
         switch (primaryLanguage) {
           case 'fr':
             return 'en';

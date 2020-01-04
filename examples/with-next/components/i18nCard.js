@@ -2,7 +2,7 @@ import { COOKIE_LOOKUP_KEY_LANG } from '@unly/universal-language-detector';
 import Cookies from 'js-cookie';
 import React from 'react';
 
-import { ACCEPTED_LANGUAGES, FALLBACK_LANG } from '../utils/i18n';
+import { SUPPORTED_LANGUAGES, FALLBACK_LANG } from '../utils/i18n';
 
 const i18nCard = (props) => {
   const { bestCountryCodes, lang } = props;
@@ -13,7 +13,7 @@ const i18nCard = (props) => {
         <strong>Detected language</strong>: <pre>{lang}</pre>
         Detected best languages: <pre>{bestCountryCodes.join(', ')}</pre>
         Using fallback language (if lang cannot be resolved): <pre>{FALLBACK_LANG}</pre>
-        Using allowed languages: <pre>{ACCEPTED_LANGUAGES.join(', ')}</pre>
+        Using allowed languages: <pre>{SUPPORTED_LANGUAGES.join(', ')}</pre>
       </div>
 
       <div className="description">

@@ -1,47 +1,46 @@
 import acceptLanguageParser from 'accept-language-parser';
 import { CustomDetector, DetectorOptions } from 'i18next-browser-languagedetector';
 import iso3166 from 'iso3166-1';
-import get from 'lodash.get';
-
-import { DEFAULT_LANG } from '../index';
-import { _defaultErrorHandler, ErrorHandler, LEVEL_ERROR, LEVEL_WARNING } from '../utils/error';
+import { _defaultErrorHandler, ERROR_LEVELS, ErrorHandler } from '../utils/error';
 
 /**
- * Resolve the user's primary language (on the server side)
+ * Resolves the best supported language from a accept-language header
+ * Returns "undefined" if fails to resolve
  *
- * Relies on the "accept-language" header
- *
- * @param {string} acceptLanguage
- * @param {string} fallbackLanguage
- * @param {Function} errorHandler
- * @return {string}
+ * @param supportedLanguages
+ * @param acceptLanguageHeader
+ * @param errorHandler
  * @private
  */
-export const _resolvePrimaryLanguageFromServer = (acceptLanguage: string | undefined, fallbackLanguage: string = DEFAULT_LANG, errorHandler: ErrorHandler = _defaultErrorHandler): string => {
-  let bestCountryCode: string = fallbackLanguage;
+export const _resolveAcceptLanguage = (supportedLanguages: string[], acceptLanguageHeader: string | undefined, errorHandler: ErrorHandler = _defaultErrorHandler): string | undefined => {
+  let bestSupportedLanguage: string | undefined;
 
   try {
-    const locales: string[] = acceptLanguageParser.parse(acceptLanguage);
-    const bestCode: string = get(locales, '[0].code');
-    bestCountryCode = iso3166.to2(iso3166.fromLocale(bestCode));
+    // Resolves the best language to used, based on an array of supportedLanguages (filters out disallowed languages)
+    // acceptLanguageParser.pick returns either a language ('fr') or a locale ('fr-FR')
+    bestSupportedLanguage = acceptLanguageParser.pick(supportedLanguages, acceptLanguageHeader, {
+      loose: true, // See https://www.npmjs.com/package/accept-language-parser#parserpicksupportedlangugagesarray-acceptlanguageheader-options--
+    });
 
-    if (!bestCountryCode) {
-      const errorMessage = `Couldn't resolve a proper country code: "${bestCountryCode}" from detected server "accept-language" header "${acceptLanguage}", which yield "${bestCode}" as best locale code - Applying fallback locale "${fallbackLanguage}"`;
-      errorHandler(new Error(errorMessage), LEVEL_WARNING);
-      bestCountryCode = fallbackLanguage;
-    }
   } catch (e) {
-    errorHandler(e, LEVEL_ERROR);
+    errorHandler(e, ERROR_LEVELS.ERROR);
   }
 
-  return bestCountryCode.toLowerCase();
+  if (bestSupportedLanguage) {
+    try {
+      // Attempts to convert the language/locale into an actual language (2 chars string)
+      return iso3166.to2(iso3166.fromLocale(bestSupportedLanguage)).toLowerCase();
+    } catch (e) {
+      errorHandler(e, ERROR_LEVELS.ERROR);
+    }
+  }
 };
 
-export const acceptLanguage = (acceptLanguage: string | undefined, fallbackLanguage?: string | undefined, errorHandler?: ErrorHandler | undefined): CustomDetector => {
+export const acceptLanguage = (supportedLanguages: string[], acceptLanguageHeader: string | undefined, errorHandler?: ErrorHandler | undefined): CustomDetector => {
   return {
     name: 'acceptLanguage',
     lookup: (options: DetectorOptions): string | undefined => {
-      return _resolvePrimaryLanguageFromServer(acceptLanguage, fallbackLanguage, errorHandler);
+      return _resolveAcceptLanguage(supportedLanguages, acceptLanguageHeader, errorHandler);
     },
     cacheUserLanguage: (): void => {
       // Do nothing, can't cache the user language on the server

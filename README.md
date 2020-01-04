@@ -74,7 +74,7 @@ See [our example](./examples/with-next) featuring the Next.js framework
 - `fallbackLanguage?`: string | undefined;
 - `acceptLanguage?`: string | undefined;
 - `serverCookies?`: object | undefined;
-- `acceptedLanguages?`: string[] | undefined;
+- `supportedLanguages?`: string[] | undefined;
 - `errorHandler?`: Function | undefined;
 
 **Example:**
@@ -83,7 +83,7 @@ const lang = universalLanguageDetect({
   fallbackLanguage: FALLBACK_LANG, // Fallback language in case the user's language cannot be resolved
   acceptLanguage: get(req, 'headers.accept-language', undefined), // The accept-language header, only used on the server side
   serverCookies: cookies, // Cookie "i18next" takes precedence over navigator configuration (ex: "i18next: fr"), only used on the server side
-  acceptedLanguages: ACCEPTED_LANGUAGES, // If the detected main language isn't allowed, then the fallback will be used
+  supportedLanguages: SUPPORTED_LANGUAGES, // If the detected main language isn't allowed, then the fallback will be used
   errorHandler: (error) => { // Use you own logger here, Sentry, etc.
     console.log('Custom error handler:');
     console.error(error);
@@ -103,7 +103,7 @@ const lang = universalLanguageDetect({
 - `req`?: IncomingMessage;
 - `serverCookies`?: object;
 - `fallbackLanguage`?: string;
-- `acceptedLanguages`?: string[];
+- `supportedLanguages`?: string[];
 - `errorHandler`?: Function | undefined;
 - `resolveSecondaryLanguage`?: Function | undefined;
 
@@ -113,12 +113,12 @@ const bestCountryCodes = universalLanguagesDetect({
   req,
   serverCookies: cookies, // Cookie "i18next" takes precedence over navigator configuration (ex: "i18next: fr")
   fallbackLanguage: FALLBACK_LANG, // Fallback language in case the user's language cannot be resolved
-  acceptedLanguages: ACCEPTED_LANGUAGES, // If the detected main language isn't allowed, then the fallback will be used
+  supportedLanguages: SUPPORTED_LANGUAGES, // If the detected main language isn't allowed, then the fallback will be used
   errorHandler: (error) => { // Use you own logger here, Sentry, etc.
     console.log('Custom error handler:');
     console.error(error);
   },
-  resolveSecondaryLanguage: (primaryLanguage, fallbackLanguage, acceptedLanguages, errorHandler) => { // If not provided, a default implementation that only covers very simple use cases (2 languages) will be used
+  resolveSecondaryLanguage: (primaryLanguage, fallbackLanguage, supportedLanguages, errorHandler) => { // If not provided, a default implementation that only covers very simple use cases (2 languages) will be used
     switch (primaryLanguage) {
       case 'fr':
         return 'en';

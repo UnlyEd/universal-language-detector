@@ -1,31 +1,11 @@
-import { IncomingMessage } from 'http';
-import {
-  _defaultResolveSecondaryLanguage,
-  COOKIE_LOOKUP_KEY_LANG,
-  DEFAULT_LANG,
-  LANG_EN,
-  LANG_FR,
-  universalLanguageDetect,
-  universalLanguagesDetect,
-} from './index';
-import { _resolvePrimaryLanguageFromServer } from './serverDetectors/acceptLanguage';
+import { COOKIE_LOOKUP_KEY_LANG, universalLanguageDetect } from './index';
 
-describe(`utils/language.ts`, () => {
-  describe(`_resolvePrimaryLanguageFromServer`, () => {
-    test(`should resolve the proper primary language on the server`, async () => {
-      expect(_resolvePrimaryLanguageFromServer(`fr,en;q=0.9,en-GB;q=0.8,en-US;q=0.7,de;q=0.6`)).toEqual('fr');
-      expect(_resolvePrimaryLanguageFromServer(`en;q=0.9,en-GB;q=0.8,en-US;q=0.7,de;q=0.6`)).toEqual('en');
-      expect(_resolvePrimaryLanguageFromServer(`us`)).toEqual('us');
-    });
-  });
+const LANG_EN = 'en';
+const LANG_FR = 'fr';
+const LANG_ES = 'es';
+const LANG_DE = 'de';
 
-  describe(`_defaultResolveSecondaryLanguage`, () => {
-    test(`should resolve the proper secondary language`, async () => {
-      expect(_defaultResolveSecondaryLanguage(LANG_FR)).toEqual(LANG_EN);
-      expect(_defaultResolveSecondaryLanguage(LANG_EN)).toEqual(LANG_FR);
-    });
-  });
-
+describe(`index.ts`, () => {
   describe(`universalLanguageDetect`, () => {
     describe(`should resolve the proper locale on the server`, () => {
       beforeEach(() => {
@@ -35,22 +15,51 @@ describe(`utils/language.ts`, () => {
         global[`document`] = undefined; // Reset to avoid tests affecting other tests
       });
 
-      test(`when using "acceptLanguage"`, async () => {
+      test(`when using "acceptLanguageHeader"`, async () => {
         expect(universalLanguageDetect({
             fallbackLanguage: LANG_EN,
-            acceptLanguage: `fr,en;q=0.9,en-GB;q=0.8,en-US;q=0.7,de;q=0.6`,
+            acceptLanguageHeader: `fr,en;q=0.9,en-GB;q=0.8,en-US;q=0.7,de;q=0.6`,
+            supportedLanguages: [LANG_EN, LANG_FR],
           }),
-        ).toEqual(`fr`);
+        ).toEqual(LANG_FR);
+
+        expect(universalLanguageDetect({
+            fallbackLanguage: LANG_EN,
+            acceptLanguageHeader: `fr,en;q=0.9,en-GB;q=0.8,en-US;q=0.7,de;q=0.6`,
+            supportedLanguages: [LANG_EN],
+          }),
+        ).toEqual(LANG_EN);
+
+        expect(universalLanguageDetect({
+            fallbackLanguage: LANG_ES,
+            acceptLanguageHeader: `fr,en;q=0.9,en-GB;q=0.8,en-US;q=0.7,de;q=0.6`,
+            supportedLanguages: [LANG_DE, LANG_ES],
+          }),
+        ).toEqual(LANG_DE);
       });
 
       test(`when the language is stored in a cookie, it should use the cookie's value`, async () => {
-        const cookieLanguage = 'fr';
+        const cookieLanguage = LANG_FR;
 
         expect(universalLanguageDetect({
           fallbackLanguage: LANG_EN,
           serverCookies: {
             [COOKIE_LOOKUP_KEY_LANG]: cookieLanguage,
           },
+          supportedLanguages: [LANG_EN, LANG_FR],
+        })).toEqual(cookieLanguage);
+      });
+
+      test(`when using both cookies and acceptLanguageHeader, it should use cookies in priority`, async () => {
+        const cookieLanguage = LANG_ES;
+
+        expect(universalLanguageDetect({
+          fallbackLanguage: LANG_DE,
+          serverCookies: {
+            [COOKIE_LOOKUP_KEY_LANG]: cookieLanguage,
+          },
+          acceptLanguageHeader: `fr,en;q=0.9,en-GB;q=0.8,en-US;q=0.7,de;q=0.6`,
+          supportedLanguages: [LANG_EN, LANG_FR, LANG_DE, LANG_ES],
         })).toEqual(cookieLanguage);
       });
     });
@@ -63,13 +72,10 @@ describe(`utils/language.ts`, () => {
         global[`document`] = undefined; // Reset to avoid tests affecting other tests
       });
 
-      test(`when no fallback is provided, it should fallback to the DEFAULT_COUNTRY_CODE`, async () => {
-        expect(universalLanguageDetect()).toEqual(DEFAULT_LANG);
-      });
-
       test(`when using a fallback value, it should fallback to the provided fallback value`, async () => {
         expect(universalLanguageDetect({
           fallbackLanguage: LANG_EN,
+          supportedLanguages: [LANG_EN, LANG_FR],
         })).toEqual(LANG_EN);
       });
 
@@ -84,116 +90,44 @@ describe(`utils/language.ts`, () => {
 
         expect(universalLanguageDetect({
           fallbackLanguage: LANG_EN,
+          supportedLanguages: [LANG_EN, LANG_FR],
         })).toEqual(cookieLanguage);
       });
     });
-  });
 
-  describe(`universalLanguagesDetect`, () => {
-    describe(`should resolve both primary and secondary languages on the server`, () => {
-      beforeEach(() => {
-        // @ts-ignore
-        global[`window`] = undefined; // Reset to avoid tests affecting other tests
-        // @ts-ignore
-        global[`document`] = undefined; // Reset to avoid tests affecting other tests
+    describe(`should throw an error when misconfigured`, () => {
+      test(`when the supported languages isn't properly defined`, async () => {
+        expect(() => {
+          universalLanguageDetect({
+            fallbackLanguage: LANG_EN,
+            supportedLanguages: [],
+          });
+        }).toThrowError();
+
+        expect(() => {
+          universalLanguageDetect({
+            fallbackLanguage: LANG_EN,
+            // @ts-ignore
+            supportedLanguages: undefined,
+          });
+        }).toThrowError();
+
+        expect(() => {
+          universalLanguageDetect({
+            fallbackLanguage: LANG_EN,
+            // @ts-ignore
+            supportedLanguages: null,
+          });
+        }).toThrowError();
       });
 
-      test(`when not providing any information, should use the default lang`, async () => {
-        // Doesn't work due to something wrong with tests order that messes up the global object somehow
-        // expect(universalLanguagesDetect()).toEqual([DEFAULT_LANG, LANG_FR]);
-      });
-
-      test(`when using "acceptLanguage"`, async () => {
-        // @ts-ignore
-        const req: IncomingMessage = {
-          headers: {
-            'accept-language': `fr,en;q=0.9,en-GB;q=0.8,en-US;q=0.7,de;q=0.6`,
-          },
-        };
-
-        expect(universalLanguagesDetect({ req })).toEqual([LANG_FR, LANG_EN]);
-      });
-
-      test(`when the language is stored in a cookie, it should use the cookie's value`, async () => {
-        const cookieLanguage = 'fr';
-
-        expect(universalLanguagesDetect({
-          serverCookies: {
-            [COOKIE_LOOKUP_KEY_LANG]: cookieLanguage,
-          },
-        })).toEqual([LANG_FR, LANG_EN]);
-      });
-
-      test(`when using custom acceptedLanguages, it should allow them`, async () => {
-        const cookieLanguage = 'es';
-
-        expect(universalLanguagesDetect({
-          serverCookies: {
-            [COOKIE_LOOKUP_KEY_LANG]: cookieLanguage,
-          },
-          acceptedLanguages: [cookieLanguage, LANG_EN],
-        })).toEqual([cookieLanguage, LANG_EN]);
-      });
-
-      test(`when using both cookies and acceptLanguage, it should use cookies in priority`, async () => {
-        const cookieLanguage = 'es';
-        // @ts-ignore
-        const req: IncomingMessage = {
-          headers: {
-            'accept-language': `fr,en;q=0.9,en-GB;q=0.8,en-US;q=0.7,de;q=0.6`,
-          },
-        };
-
-        expect(universalLanguagesDetect({
-          req,
-          serverCookies: {
-            [COOKIE_LOOKUP_KEY_LANG]: cookieLanguage,
-          },
-          acceptedLanguages: [cookieLanguage, LANG_EN],
-        })).toEqual([cookieLanguage, LANG_EN]);
-      });
-    });
-
-    describe(`should resolve both primary and secondary languages on the browser`, () => {
-      beforeEach(() => {
-        // @ts-ignore
-        global[`window`] = {}; // Make believe we're running against a browser
-        // @ts-ignore
-        global[`document`] = undefined; // Reset to avoid tests affecting other tests
-      });
-
-      test(`when not providing any information, should use the default lang`, async () => {
-        expect(universalLanguagesDetect()).toEqual([DEFAULT_LANG, LANG_FR]);
-      });
-
-      test(`when not providing any information, but specifying a fallback lang, should use that fallback`, async () => {
-        expect(universalLanguagesDetect({ fallbackLanguage: LANG_FR })).toEqual([LANG_FR, LANG_EN]);
-      });
-
-      test(`when the language is stored in a cookie, it should use the cookie's value`, async () => {
-        const cookieLanguage = 'fr';
-
-        // Make believe a cookie is available
-        // @ts-ignore
-        global[`document`] = {
-          cookie: `${COOKIE_LOOKUP_KEY_LANG}=${cookieLanguage};`,
-        };
-
-        expect(universalLanguagesDetect()).toEqual([LANG_FR, LANG_EN]);
-      });
-
-      test(`when using custom acceptedLanguages, it should allow them`, async () => {
-        const cookieLanguage = 'es';
-
-        // Make believe a cookie is available
-        // @ts-ignore
-        global[`document`] = {
-          cookie: `${COOKIE_LOOKUP_KEY_LANG}=${cookieLanguage};`,
-        };
-
-        expect(universalLanguagesDetect({
-          acceptedLanguages: [cookieLanguage, LANG_EN],
-        })).toEqual([cookieLanguage, LANG_EN]);
+      test(`when the fallback language isn't present in the supported languages`, async () => {
+        expect(() => {
+          universalLanguageDetect({
+            fallbackLanguage: LANG_EN,
+            supportedLanguages: [LANG_FR],
+          });
+        }).toThrowError();
       });
     });
   });
