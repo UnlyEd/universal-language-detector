@@ -47,17 +47,17 @@ export const _cleanupDisallowedLanguages = (language: string, fallbackLanguage: 
  * @return {string}
  */
 export const universalLanguageDetect = (props: {
+  supportedLanguages: string[];
   fallbackLanguage: string;
   acceptLanguageHeader?: string | undefined;
   serverCookies?: object | undefined;
-  supportedLanguages: string[];
   errorHandler?: ErrorHandler | undefined;
 }): string => {
   const {
+    supportedLanguages,
     fallbackLanguage,
     acceptLanguageHeader = undefined,
     serverCookies = undefined,
-    supportedLanguages,
     errorHandler = undefined,
   } = props;
 
