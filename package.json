@@ -1,6 +1,6 @@
 {
   "name": "@unly/universal-language-detector",
-  "version": "2.0.0-beta.9",
+  "version": "2.0.0-beta.10",
   "description": "Language detector that works universally (browser + server) - Meant to be used with a universal framework, such as Next.js",
   "scripts": {
     "start": "cross-env-shell 'concurrently -p '{name}' -n 'lint,build,test' -c 'gray.bgWhite,yellow.bgBlue,green.bgWhite' \"yarn lint\" \"yarn build\" \"yarn test\"'",
