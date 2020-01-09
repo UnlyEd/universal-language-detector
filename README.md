@@ -31,6 +31,7 @@ _It is not out of scope though, PR are welcome to support universal locale detec
     + [SemVer](#semver)
   * [Releasing and publishing](#releasing-and-publishing)
 - [Changelog](#changelog)
+- [See [changelog](./CHANGELOG.md)](#see-changelogchangelogmd)
 - [License](#license)
 
 <!-- tocstop -->
@@ -152,7 +153,6 @@ npm publish # Will publish to NPM
 > Our API change (including breaking changes and "how to migrate") are documented in the Changelog.
 
 See [changelog](./CHANGELOG.md)
-test
 ---
 
 ## License
