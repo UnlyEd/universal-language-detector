@@ -1,6 +1,6 @@
 {
   "name": "@unly/universal-language-detector",
-  "version": "2.0.0-beta.3",
+  "version": "2.0.0-beta.4",
   "description": "Language detector that works universally (browser + server) - Meant to be used with a universal framework, such as Next.js",
   "scripts": {
     "start": "cross-env-shell 'concurrently -p '{name}' -n 'lint,build,test' -c 'gray.bgWhite,yellow.bgBlue,green.bgWhite' \"yarn lint\" \"yarn build\" \"yarn test\"'",
@@ -11,10 +11,11 @@
     "lint:once": "eslint src --ext .ts --ext .tsx",
     "lint:fix": "eslint src --ext .ts --ext .tsx --fix",
     "lint:fix:preview": "eslint src --ext .ts --ext .tsx --fix-dry-run",
+    "postversion": "git add README.md CHANGELOG.md && git commit --amend --no-edit && git push --follow-tags",
     "preversion": "yarn lint:once && yarn test:once && yarn doc:toc",
     "prepublishOnly": "yarn clean && yarn build:once && yarn publish:preview && cli-confirm \"Do you really want to release a new version? Please check the files that will be publicly released first. (y/n)\"",
     "publish:preview": "npm pack && tar -xvzf *.tgz && rm -rf package *.tgz",
-    "release": "yarn bump --prompt --commit --tag && git add README.md CHANGELOG.md && git commit --amend --no-edit && git push --follow-tags",
+    "release": "yarn bump --prompt --commit --tag",
     "releaseAndPublish": "yarn release && npm publish",
     "doc:toc": "yarn markdown-toc --maxdepth 4 -i README.md",
     "test": "NODE_ENV=test jest --watchAll",
