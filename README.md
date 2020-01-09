@@ -30,6 +30,7 @@ _It is not out of scope though, PR are welcome to support universal locale detec
   * [Versions](#versions)
     + [SemVer](#semver)
   * [Releasing and publishing](#releasing-and-publishing)
+- [Changelog](#changelog)
 - [License](#license)
 
 <!-- tocstop -->
@@ -143,6 +144,14 @@ npm publish # Will publish to NPM
 > Don't forget we are using SemVer, please follow our SemVer rules.
 
 **Pro hint**: use `beta` tag if you're in a work-in-progress (or unsure) to avoid releasing WIP versions that looks legit
+
+---
+
+## Changelog
+
+> Our API change (including breaking changes and "how to migrate") are documented in the Changelog.
+
+See [changelog](./CHANGELOG.md)
 
 ---
 
