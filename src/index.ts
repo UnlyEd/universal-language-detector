@@ -1,31 +1,17 @@
 import { isBrowser } from '@unly/utils';
-import acceptLanguageParser from 'accept-language-parser';
-import { IncomingMessage } from 'http';
 import I18next from 'i18next';
 import I18nextBrowserLanguageDetector from 'i18next-browser-languagedetector';
-import iso3166 from 'iso3166-1';
-import get from 'lodash.get';
 import includes from 'lodash.includes';
+import get from 'lodash.get';
 
-export const LANG_EN = 'en';
-export const LANG_FR = 'fr';
-export const DEFAULT_ACCEPTED_LANGUAGES = [
-  LANG_EN,
-  LANG_FR,
-];
-
-/**
- * Language used by default if no user language can be resolved
- * We use English because it's the most used languages among those supported
- *
- * @type {string}
- */
-export const DEFAULT_LANG: string = LANG_EN;
+import AcceptLanguageDetector from './serverDetectors/acceptLanguage';
+import ServerCookieDetector from './serverDetectors/serverCookie';
+import FallbackDetector from './universalDetectors/fallback';
+import { ErrorHandler } from './utils/error';
 
 /**
  * Lookup key that contains the value of the user's selected language
  *
- * XXX Must use the same value as the value used by i18next-browser-languageDetector "lookupCookie"
  * @see https://github.com/i18next/i18next-browser-languageDetector#detector-options
  *
  * @type {string}
@@ -33,87 +19,16 @@ export const DEFAULT_LANG: string = LANG_EN;
 export const COOKIE_LOOKUP_KEY_LANG = 'i18next';
 
 /**
- * Default error handler
- * Doesn't do anything but log the error to the console
- *
- * @param error
- */
-const defaultErrorHandler = (error: Error): void => {
-  // eslint-disable-next-line no-console
-  console.error(error);
-};
-
-/**
- * Resolves a secondary locale based on a given primary locale
- * The alternative locale won't be the same as the primary locale
- *
- * XXX This implementation assumes the app uses only FR/EN locales,
- *  if other locales are added then the implementation should be changed
- *
- * Because the implementation of such a function could be business-related, we decided to provide a very simple way of handling it,
- * while allowing to use a custom function to resolve it
- *
- * @param {string} primaryLocale
- * @param {string} fallbackSecondaryLanguage
- * @param {string[]} acceptedLanguages
- * @param {Function} errorHandler
- * @return {string}
- */
-export const defaultResolveSecondaryLanguage = (primaryLocale: string, fallbackSecondaryLanguage: string = DEFAULT_LANG, acceptedLanguages: string[] = DEFAULT_ACCEPTED_LANGUAGES, errorHandler: Function = defaultErrorHandler): string => {
-  if (acceptedLanguages.length > 2) {
-    errorHandler(new Error(`[NOT IMPLEMENTED] - resolveSecondaryLanguage was called with ${acceptedLanguages.length} accepted languages, but the current implementation was not made to support more than 2. Please implement.`));
-    return fallbackSecondaryLanguage.toLowerCase();
-  } else {
-    if (primaryLocale.toLowerCase() === LANG_FR.toLowerCase()) {
-      return LANG_EN.toLowerCase();
-    } else if (primaryLocale === LANG_EN.toLowerCase()) {
-      return LANG_FR.toLowerCase();
-    } else {
-      return fallbackSecondaryLanguage.toLowerCase();
-    }
-  }
-};
-
-/**
- * Resolve the user's primary language (on the server side)
- *
- * Relies on the "accept-language" header
- *
- * @param {string} acceptLanguage
- * @param {string} fallbackLanguage
- * @param {Function} errorHandler
- * @return {string}
- */
-export const resolvePrimaryLanguageFromServer = (acceptLanguage: string | undefined, fallbackLanguage: string = DEFAULT_LANG, errorHandler: Function = defaultErrorHandler): string => {
-  let bestCountryCode: string = fallbackLanguage;
-
-  try {
-    const locales: string[] = acceptLanguageParser.parse(acceptLanguage);
-    const bestCode: string = get(locales, '[0].code');
-    bestCountryCode = iso3166.to2(iso3166.fromLocale(bestCode));
-
-    if (!bestCountryCode) {
-      const errorMessage = `Couldn't resolve a proper country code: "${bestCountryCode}" from detected server "accept-language" header "${acceptLanguage}", which yield "${bestCode}" as best locale code - Applying fallback locale "${fallbackLanguage}"`;
-      errorHandler(new Error(errorMessage));
-      bestCountryCode = fallbackLanguage;
-    }
-  } catch (e) {
-    errorHandler(e);
-  }
-
-  return bestCountryCode.toLowerCase();
-};
-
-/**
  * Replaces a given language by another one if it's not an allowed language
  *
  * @param {string} language
  * @param {string} fallbackLanguage
- * @param {string[]} acceptedLanguages
+ * @param {string[]} supportedLanguages
  * @return {string}
+ * @private
  */
-export const cleanupDisallowedLanguages = (language: string, fallbackLanguage: string = DEFAULT_LANG, acceptedLanguages: string[] = DEFAULT_ACCEPTED_LANGUAGES): string => {
-  if (!includes(acceptedLanguages, language)) {
+export const _cleanupDisallowedLanguages = (language: string, fallbackLanguage: string, supportedLanguages: string[]): string => {
+  if (!includes(supportedLanguages, language)) {
     return fallbackLanguage.toLowerCase();
   } else {
     return language.toLowerCase();
@@ -132,101 +47,62 @@ export const cleanupDisallowedLanguages = (language: string, fallbackLanguage: s
  * @return {string}
  */
 export const universalLanguageDetect = (props: {
-  fallbackLanguage?: string | undefined;
-  acceptLanguage?: string | undefined;
+  supportedLanguages: string[];
+  fallbackLanguage: string;
+  acceptLanguageHeader?: string | undefined;
   serverCookies?: object | undefined;
-  acceptedLanguages?: string[] | undefined;
-  errorHandler?: Function | undefined;
-} = {}): string => {
+  errorHandler?: ErrorHandler | undefined;
+}): string => {
   const {
-    fallbackLanguage = DEFAULT_LANG,
-    acceptLanguage = undefined,
+    supportedLanguages,
+    fallbackLanguage,
+    acceptLanguageHeader = undefined,
     serverCookies = undefined,
-    acceptedLanguages = DEFAULT_ACCEPTED_LANGUAGES,
     errorHandler = undefined,
   } = props;
 
-  I18next.init(); // Init may be async, but it doesn't matter here, because we just want to init the services (which is sync) so that we may use them
+  if(!get(supportedLanguages, 'length')){
+    throw new Error(`universal-language-detector is misconfigured. Your "supportedLanguages" should be an array containing at least one language (eg: ['en']).`);
+  }
+
+  if(!includes(supportedLanguages, fallbackLanguage)){
+    throw new Error(`universal-language-detector is misconfigured. Your "fallbackLanguage" (value: "${fallbackLanguage}") should be within your "supportedLanguages" array.`);
+  }
+
+  // Init may be async, but it doesn't matter here, because we just want to init the services (which is sync) so that we may use them
+  I18next.init({
+    whitelist: supportedLanguages, // Filter out unsupported languages (i.e: when using "navigator" detector) - See https://www.i18next.com/overview/configuration-options#languages-namespaces-resources
+  });
 
   const i18nextServices = I18next.services;
   const i18nextUniversalLanguageDetector = new I18nextBrowserLanguageDetector();
-  const fallbackDetectorName = 'fallback';
-  const fallbackDetector = {
-    name: fallbackDetectorName,
-    lookup: (): string | undefined => {
-      return fallbackLanguage;
-    },
-    cacheUserLanguage: (): void => {
-      // Do nothing, can't cache the user language on the server
-    },
-  };
+
+  // Add common detectors between the browser and the server
+  const fallbackDetector = FallbackDetector(fallbackLanguage);
   i18nextUniversalLanguageDetector.addDetector(fallbackDetector);
 
   if (isBrowser()) {
+    // Rely on native i18next detectors
     i18nextUniversalLanguageDetector.init(i18nextServices, {
-      order: ['cookie', 'navigator', fallbackDetectorName],
+      order: ['cookie', 'navigator', fallbackDetector.name],
+      lookupCookie: COOKIE_LOOKUP_KEY_LANG,
     });
 
   } else {
-    const serverCookieDetectorName = 'serverCookie';
-    const serverCookieDetector = {
-      name: serverCookieDetectorName,
-      lookup: (): string => {
-        return get(serverCookies, COOKIE_LOOKUP_KEY_LANG, undefined);
-      },
-      cacheUserLanguage: (): void => {
-        // Do nothing, we could cache the value but it doesn't make sense to overwrite the cookie with the same value
-      },
-    };
-    const acceptLanguageDetectorName = 'acceptLanguage';
-    const acceptLanguageDetector = {
-      name: acceptLanguageDetectorName,
-      lookup: (): string | undefined => {
-        return resolvePrimaryLanguageFromServer(acceptLanguage, fallbackLanguage, errorHandler);
-      },
-      cacheUserLanguage: (): void => {
-        // Do nothing, can't cache the user language on the server
-      },
-    };
+    // Use our own detectors
+    const serverCookieDetector = ServerCookieDetector(serverCookies);
+    const acceptLanguageDetector = AcceptLanguageDetector(supportedLanguages, acceptLanguageHeader, errorHandler);
 
     i18nextUniversalLanguageDetector.addDetector(serverCookieDetector);
     i18nextUniversalLanguageDetector.addDetector(acceptLanguageDetector);
+
     i18nextUniversalLanguageDetector.init(i18nextServices, {
-      order: [serverCookieDetectorName, acceptLanguageDetectorName, fallbackDetectorName],
+      order: [serverCookieDetector.name, acceptLanguageDetector.name, fallbackDetector.name],
+      lookupCookie: COOKIE_LOOKUP_KEY_LANG,
     });
   }
 
-  return cleanupDisallowedLanguages(i18nextUniversalLanguageDetector.detect() as string, fallbackLanguage, acceptedLanguages);
+  return _cleanupDisallowedLanguages(i18nextUniversalLanguageDetector.detect() as string, fallbackLanguage, supportedLanguages);
 };
 
-/**
- * Detect the 2 most preferred user's languages, universally (browser + server)
- *
- * @param props
- */
-export const universalLanguagesDetect = (props: {
-  req?: IncomingMessage;
-  serverCookies?: object;
-  fallbackLanguage?: string;
-  acceptedLanguages?: string[];
-  errorHandler?: Function | undefined;
-  resolveSecondaryLanguage?: Function | undefined;
-} = {}): string[] => {
-  const {
-    req = undefined,
-    serverCookies = undefined,
-    fallbackLanguage = DEFAULT_LANG,
-    acceptedLanguages = DEFAULT_ACCEPTED_LANGUAGES,
-    errorHandler = undefined,
-    resolveSecondaryLanguage = defaultResolveSecondaryLanguage,
-  } = props;
-  const primaryLanguage = universalLanguageDetect({
-    fallbackLanguage,
-    acceptLanguage: get(req, 'headers.accept-language', undefined),
-    serverCookies,
-    acceptedLanguages,
-    errorHandler,
-  });
-
-  return [primaryLanguage, resolveSecondaryLanguage(primaryLanguage, fallbackLanguage, acceptedLanguages, errorHandler)];
-};
+export default universalLanguageDetect;

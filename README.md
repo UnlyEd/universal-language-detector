@@ -5,11 +5,8 @@
 
 > Language detector that works universally (browser + server)
 >
-> On the server, will rely on "cookies > accept-language header"
->
-> On the browser, will rely on "cookies > navigator settings"
->
-> Relies on [i18next](https://github.com/i18next/i18next) behind the wheel
+> - On the server, will rely on "cookies > accept-language header"
+> - On the browser, will rely on "cookies > navigator settings"
 >
 > Meant to be used with a universal framework, such as Next.js
 
@@ -27,10 +24,11 @@ _It is not out of scope though, PR are welcome to support universal locale detec
 - [Examples](#examples)
 - [API](#api)
   * [`universalLanguageDetect`](#universallanguagedetect)
-  * [`universalLanguagesDetect` (plural)](#universallanguagesdetect-plural)
 - [Contributing](#contributing)
   * [Working locally](#working-locally)
   * [Test](#test)
+  * [Versions](#versions)
+    + [SemVer](#semver)
   * [Releasing and publishing](#releasing-and-publishing)
 - [License](#license)
 
@@ -51,7 +49,11 @@ yarn install @unly/universal-language-detector
 Use:
 
 ```
-import { universalLanguagesDetect, universalLanguageDetect } from '@unly/universal-language-detector';
+import universalLanguageDetect from '@unly/universal-language-detector';
+
+OR
+
+import { universalLanguageDetect } from '@unly/universal-language-detector';
 ```
 
 ## Examples
@@ -70,65 +72,23 @@ See [our example](./examples/with-next) featuring the Next.js framework
 
 > Detects the language used, universally. 
 
-**Parameters:** _(All parameters are optional)_
-- `fallbackLanguage?`: string | undefined;
-- `acceptLanguage?`: string | undefined;
+**Parameters:**
+- `supportedLanguages`: string[];
+- `fallbackLanguage`: string;
+- `acceptLanguageHeader?`: string | undefined;
 - `serverCookies?`: object | undefined;
-- `acceptedLanguages?`: string[] | undefined;
-- `errorHandler?`: Function | undefined;
+- `errorHandler?`: [ErrorHandler](./src/utils/error.ts) | undefined;
 
 **Example:**
 ```js
 const lang = universalLanguageDetect({
+  supportedLanguages: SUPPORTED_LANGUAGES, // Whitelist of supported languages, will be used to filter out languages that aren't supported
   fallbackLanguage: FALLBACK_LANG, // Fallback language in case the user's language cannot be resolved
-  acceptLanguage: get(req, 'headers.accept-language', undefined), // The accept-language header, only used on the server side
-  serverCookies: cookies, // Cookie "i18next" takes precedence over navigator configuration (ex: "i18next: fr"), only used on the server side
-  acceptedLanguages: ACCEPTED_LANGUAGES, // If the detected main language isn't allowed, then the fallback will be used
-  errorHandler: (error) => { // Use you own logger here, Sentry, etc.
+  acceptLanguageHeader: get(req, 'headers.accept-language'), // Optional - Accept-language header will be used when resolving the language on the server side
+  serverCookies: cookies, // Optional - Cookie "i18next" takes precedence over navigator configuration (ex: "i18next: fr"), will only be used on the server side
+  errorHandler: (error) => { // Optional - Use you own logger here, Sentry, etc.
     console.log('Custom error handler:');
     console.error(error);
-  }
-});
-```
-
-### `universalLanguagesDetect` (plural)
-
-> Detect the 2 most preferred user's languages.
->
-> Most useful if you have some kind of fallback strategy when the content isn't available in the main language
->
-> _For instance, it's very useful with GraphCMS and their GraphQL [i18n header implementation](https://graphcms.com/docs/api/content-api/#passing-a-header-flag), which has such built-in fallback_
-
-**Parameters:** _(All parameters are optional)_
-- `req`?: IncomingMessage;
-- `serverCookies`?: object;
-- `fallbackLanguage`?: string;
-- `acceptedLanguages`?: string[];
-- `errorHandler`?: Function | undefined;
-- `resolveSecondaryLanguage`?: Function | undefined;
-
-**Example:**
-```js
-const bestCountryCodes = universalLanguagesDetect({
-  req,
-  serverCookies: cookies, // Cookie "i18next" takes precedence over navigator configuration (ex: "i18next: fr")
-  fallbackLanguage: FALLBACK_LANG, // Fallback language in case the user's language cannot be resolved
-  acceptedLanguages: ACCEPTED_LANGUAGES, // If the detected main language isn't allowed, then the fallback will be used
-  errorHandler: (error) => { // Use you own logger here, Sentry, etc.
-    console.log('Custom error handler:');
-    console.error(error);
-  },
-  resolveSecondaryLanguage: (primaryLanguage, fallbackLanguage, acceptedLanguages, errorHandler) => { // If not provided, a default implementation that only covers very simple use cases (2 languages) will be used
-    switch (primaryLanguage) {
-      case 'fr':
-        return 'en';
-      case 'en':
-        return 'es';
-      case 'es':
-        return 'en';
-      default:
-        return 'en';
-    }
   },
 });
 ```
@@ -159,6 +119,18 @@ yarn test:once
 yarn test:coverage
 ```
 
+### Versions
+
+#### SemVer
+
+We use Semantic Versioning for this project: https://semver.org/. (`vMAJOR.MINOR.PATCH`: `v1.0.1`)
+
+- Major version: Must be changed when Breaking Changes are made (public API isn't backward compatible).
+  - A function has been renamed/removed from the public API
+  - Something has changed that will cause the app to behave differently with the same configuration
+- Minor version: Must be changed when a new feature is added or updated (without breaking change nor behavioral change)
+- Patch version: Must be changed when any change is made that isn't either Major nor Minor. (Misc, doc, etc.)
+
 ### Releasing and publishing
 
 ```
@@ -167,6 +139,12 @@ yarn releaseAndPublish # Shortcut - Will prompt for bump version, commit, create
 yarn release # Will prompt for bump version, commit, create git tag, push commit/tag
 npm publish # Will publish to NPM
 ```
+
+> Don't forget we are using SemVer, please follow our SemVer rules.
+
+**Pro hint**: use `beta` tag if you're in a work-in-progress (or unsure) to avoid releasing WIP versions that looks legit
+
+---
 
 ## License
 
