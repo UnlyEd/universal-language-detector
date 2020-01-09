@@ -22,8 +22,8 @@ It works from the server side (SSR), and upon client side navigation too
 
 ### Deploying
 
-`now`
+`yarn deploy`
 
 ### Deploying to production
 
-`now --prod`
+`yarn deploy:production`
