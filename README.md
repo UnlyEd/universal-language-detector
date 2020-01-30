@@ -1,3 +1,4 @@
+<a href="https://unly.org"><img src="https://storage.googleapis.com/unly/images/ICON_UNLY.png" align="right" height="20" alt="Unly logo" title="Unly logo" /></a>
 [![Maintainability](https://api.codeclimate.com/v1/badges/424ff73928475fd2331f/maintainability)](https://codeclimate.com/github/UnlyEd/universal-language-detector/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/424ff73928475fd2331f/test_coverage)](https://codeclimate.com/github/UnlyEd/universal-language-detector/test_coverage)
 [![Known Vulnerabilities](https://snyk.io/test/github/UnlyEd/universal-language-detector/badge.svg?targetFile=package.json)](https://snyk.io/test/github/UnlyEd/universal-language-detector?targetFile=package.json)
