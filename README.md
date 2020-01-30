@@ -1,6 +1,7 @@
+<a href="https://unly.org"><img src="https://storage.googleapis.com/unly/images/ICON_UNLY.png" align="right" height="20" alt="Unly logo" title="Unly logo" /></a>
 [![Maintainability](https://api.codeclimate.com/v1/badges/424ff73928475fd2331f/maintainability)](https://codeclimate.com/github/UnlyEd/universal-language-detector/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/424ff73928475fd2331f/test_coverage)](https://codeclimate.com/github/UnlyEd/universal-language-detector/test_coverage)
-
+[![Known Vulnerabilities](https://snyk.io/test/github/UnlyEd/universal-language-detector/badge.svg?targetFile=package.json)](https://snyk.io/test/github/UnlyEd/universal-language-detector?targetFile=package.json)
 # Universal Language Detector
 
 > Language detector that works universally (browser + server)
@@ -32,6 +33,9 @@ _It is not out of scope though, PR are welcome to support universal locale detec
   * [Releasing and publishing](#releasing-and-publishing)
 - [Changelog](#changelog)
 - [License](#license)
+- [Vulnerability disclosure](#vulnerability-disclosure)
+- [Contributors and maintainers](#contributors-and-maintainers)
+- [**[ABOUT UNLY]**](#about-unly-)
 
 <!-- tocstop -->
 
@@ -162,3 +166,33 @@ MIT
 ---
 
 > This project was generated using https://github.com/UnlyEd/boilerplate-generator/tree/master/templates/typescript-OSS
+
+# Vulnerability disclosure
+
+[See our policy](https://github.com/UnlyEd/Unly).
+
+---
+
+# Contributors and maintainers
+
+This project is being maintained by:
+- [Unly] Ambroise Dhenain ([Vadorequest](https://github.com/vadorequest)) **(active)**
+
+---
+
+# **[ABOUT UNLY]** <a href="https://unly.org"><img src="https://storage.googleapis.com/unly/images/ICON_UNLY.png" height="40" align="right" alt="Unly logo" title="Unly logo" /></a>
+
+> [Unly](https://unly.org) is a socially responsible company, fighting inequality and facilitating access to higher education. 
+> Unly is committed to making education more inclusive, through responsible funding for students. 
+
+We provide technological solutions to help students find the necessary funding for their studies. 
+
+We proudly participate in many TechForGood initiatives. To support and learn more about our actions to make education accessible, visit : 
+- https://twitter.com/UnlyEd
+- https://www.facebook.com/UnlyEd/
+- https://www.linkedin.com/company/unly
+- [Interested to work with us?](https://jobs.zenploy.io/unly/about)
+
+Tech tips and tricks from our CTO on our [Medium page](https://medium.com/unly-org/tech/home)!
+
+#TECHFORGOOD #EDUCATIONFORALL
