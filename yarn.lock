@@ -1000,6 +1000,11 @@
   resolved "https://registry.yarnpkg.com/@unly/cli-confirm/-/cli-confirm-1.1.1.tgz#0d4f9ef44e3d142ad8d0ffe2037059d6ad118f56"
   integrity sha512-OqjK3zNlhqBfd+G8y5qCXjYvh2FHg1FOOtns6Zy4hOGaVTyQcUR2AWoXXyF6AN852vsx6l7ctFXBWr5y20DrJw==
 
+"@unly/iso3166-1@1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@unly/iso3166-1/-/iso3166-1-1.0.2.tgz#ef1504b4aa6e618b800c14a77261a6c5e9449fa0"
+  integrity sha512-aL/7cmcfjpwOaKFr9XHcWP/Z7lQjKLm5NMcjncT96aeSJxfblmPLnH/8lnX0GrWWFA2/CseCxnA73u5eiZcClA==
+
 "@unly/utils@1.0.3":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@unly/utils/-/utils-1.0.3.tgz#6fd8e361dfb977f0cfdc9ce83d7f0719dd6ae3de"
@@ -3160,11 +3165,6 @@ isexe@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/isexe/-/isexe-2.0.0.tgz#e8fbf374dc556ff8947a10dcb0572d633f2cfa10"
   integrity sha1-6PvzdNxVb/iUehDcsFctYz8s+hA=
-
-iso3166-1@0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/iso3166-1/-/iso3166-1-0.5.0.tgz#1847ef4072076695fd9d7890cc45e8015c5da097"
-  integrity sha512-jqInw+bSmkmJNh7wWTyRiBzilAmq7mMt+9Ly6Z+7pGwTMimDqMCAooGpfypwejMX8TmDFo4E9zwbi57olJ0feA==
 
 isobject@^2.0.0:
   version "2.1.0"
