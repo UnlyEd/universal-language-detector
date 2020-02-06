@@ -1,6 +1,8 @@
 CHANGELOG
 ===
 
+- v2.0.2 - 2020-02-06
+    - [Bugfix] Use `@unly/iso3166-1` instead of `iso3166-1` in source code (forgot to change this alongside the package.json in v2.0.1) 
 - v2.0.1 - 2020-02-04
     - [Enhancement] Use `@unly/iso3166-1` instead of `iso3166-1` (robustness)
 - v2.0.0 - 2020-01-09
