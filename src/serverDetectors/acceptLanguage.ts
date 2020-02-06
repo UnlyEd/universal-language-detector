@@ -1,6 +1,6 @@
 import acceptLanguageParser from 'accept-language-parser';
 import { CustomDetector, DetectorOptions } from 'i18next-browser-languagedetector';
-import iso3166 from 'iso3166-1';
+import iso3166 from '@unly/iso3166-1';
 import { _defaultErrorHandler, ERROR_LEVELS, ErrorHandler } from '../utils/error';
 
 /**
