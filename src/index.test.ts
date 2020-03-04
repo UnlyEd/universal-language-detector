@@ -79,6 +79,30 @@ describe(`index.ts`, () => {
         })).toEqual(LANG_EN);
       });
 
+      test(`when relying on "navigator" resolver`, async () => {
+        // @ts-ignore
+        global[`navigator`] = {
+          languages: [LANG_EN, LANG_FR],
+        };
+
+        expect(universalLanguageDetect({
+          fallbackLanguage: LANG_FR,
+          supportedLanguages: [LANG_EN, LANG_FR],
+        })).toEqual(LANG_EN);
+      });
+
+      test(`when relying on "navigator" resolver and the device uses localised languages (eg: "en-US")`, async () => {
+        // @ts-ignore
+        global[`navigator`] = {
+          languages: ["en-US", "fr-FR", "fr", "en"],
+        };
+
+        expect(universalLanguageDetect({
+          fallbackLanguage: LANG_FR,
+          supportedLanguages: [LANG_EN, LANG_FR],
+        })).toEqual(LANG_EN);
+      });
+
       test(`when the language is stored in a cookie, it should use the cookie's value`, async () => {
         const cookieLanguage = 'fr';
 
