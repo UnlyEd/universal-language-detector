@@ -1,6 +1,8 @@
 CHANGELOG
 ===
 
+- v2.0.3 - 2020-03-04
+    - [Bugfix] Localised languages such as fr-FR/en-US where blacklisted when using the "navigator" resolver, which caused the language to be wrongfully detected (i.e: "en-US, fr, en" would return "fr"), now it properly returns "en"
 - v2.0.2 - 2020-02-06
     - [Bugfix] Use `@unly/iso3166-1` instead of `iso3166-1` in source code (forgot to change this alongside the package.json in v2.0.1) 
 - v2.0.1 - 2020-02-04
