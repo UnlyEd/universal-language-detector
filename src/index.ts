@@ -19,23 +19,6 @@ import { ErrorHandler } from './utils/error';
 export const COOKIE_LOOKUP_KEY_LANG = 'i18next';
 
 /**
- * Replaces a given language by another one if it's not an allowed language
- *
- * @param {string} language
- * @param {string} fallbackLanguage
- * @param {string[]} supportedLanguages
- * @return {string}
- * @private
- */
-export const _cleanupDisallowedLanguages = (language: string, fallbackLanguage: string, supportedLanguages: string[]): string => {
-  if (!includes(supportedLanguages, language)) {
-    return fallbackLanguage.toLowerCase();
-  } else {
-    return language.toLowerCase();
-  }
-};
-
-/**
  * Detects the user's language, universally (browser + server)
  * Internally relies on i18next to help resolve the language
  *
@@ -103,7 +86,10 @@ export const universalLanguageDetect = (props: {
     });
   }
 
-  return _cleanupDisallowedLanguages(i18nextUniversalLanguageDetector.detect() as string, fallbackLanguage, supportedLanguages);
+  // Transform potential localised language into non-localised language:
+  // "en-US" > "en"
+  // "en" > "en"
+  return (i18nextUniversalLanguageDetector.detect() as string).split('-')[0];
 };
 
 export default universalLanguageDetect;
