@@ -7,7 +7,7 @@ import I18nCard from '../components/i18nCard';
 import Nav from '../components/nav';
 
 const Page2 = (props) => {
-  const { lang } = props;
+  const { lang, isSSR } = props;
 
   return (
     <div>
@@ -20,7 +20,7 @@ const Page2 = (props) => {
 
       <div className="hero">
         <h1 className="title">Welcome to our "with-next" example, featuring Next.js!</h1>
-        <h2>Which works also with client-side navigation!</h2>
+        <h2>Using {isSSR ? 'server-side' : 'client-side'} detection</h2>
         <hr />
 
         <I18nCard
