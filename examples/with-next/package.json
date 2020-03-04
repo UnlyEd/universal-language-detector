@@ -10,7 +10,7 @@
     "deploy:production": "now --prod"
   },
   "dependencies": {
-    "@unly/universal-language-detector": "2.0.0",
+    "@unly/universal-language-detector": "2.0.2",
     "js-cookie": "2.2.1",
     "next": "9.1.6",
     "next-cookies": "2.0.3",
